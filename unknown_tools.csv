@@ -1,0 +1,35 @@
+Name,Website,Platform,Row
+FSL,https://fsl.fmrib.ox.ac.uk/,Linux/macOS/Windows,3
+AFNI,https://afni.nimh.nih.gov/,Linux/macOS,4
+FreeSurfer,https://surfer.nmr.mgh.harvard.edu/,Linux/macOS,5
+fMRIPrep,https://fmriprep.org/,Linux/Docker/Singularity,15
+QSIPrep,https://qsiprep.readthedocs.io/,Linux/Docker,16
+C-PAC,https://fcp-indi.github.io/,Docker/Singularity,17
+BIDS Apps,https://bids-apps.neuroimaging.io/,Docker/Singularity,19
+NeuroDocker,https://github.com/ReproNim/neurodocker,Docker/Singularity,23
+BrainSuite,http://brainsuite.org/,Windows/Linux,28
+MRIcron,https://people.cas.sc.edu/rorden/mricron/,Win/macOS/Linux,35
+Surfice,https://www.nitrc.org/projects/surfice/,Win/macOS/Linux,36
+FSLeyes,https://open.win.ox.ac.uk/pages/fsl/fsleyes/fsleyes.html,Win/macOS/Linux,37
+Connectome Workbench,https://www.humanconnectome.org/software/connectome-workbench,Win/macOS/Linux,38
+CIVET,https://www.bic.mni.mcgill.ca/ServicesSoftware/CIVET,Linux,39
+MINC Toolkit,https://bic-mni.github.io/,Linux/macOS,40
+ANTs BrainExtraction,http://stnava.github.io/ANTs/,ANTs,49
+DTI-TK,http://dti-tk.sourceforge.net/pmwiki/pmwiki.php,Linux/macOS,52
+TORTOISE,https://tortoise.nibib.nih.gov/,Windows/Linux,53
+DSI Studio,https://dsi-studio.labsolver.org/,Windows/macOS/Linux,54
+SlicerDMRI,https://dmri.slicer.org/,3D Slicer,57
+xcpEngine,https://xcpengine.readthedocs.io/,Linux,78
+CIFTIFY,https://github.com/edickie/ciftify,Linux/HC,80
+sLORETA,http://www.uzh.ch/keyinst/loreta.htm,Windows,87
+BESA (commercial),https://www.besa.de/,Windows,88
+CURRY (commercial),https://compumedicsneuroscan.com/,Windows,89
+CARTOOL,https://sites.google.com/site/cartoolcommunity/,Windows,90
+PMOD (commercial),https://www.pmod.com/,Windows/Linux,94
+AMIDE,http://amide.sourceforge.net/,Linux/macOS/Windows,95
+LCModel (commercial),http://www.lcmodel.com/,Windows/Linux,99
+GingerALE,https://brainmap.org/ale/,Win/Linux,104
+Seed-based d Mapping (AES-SDM),https://www.sdmproject.com/,Windows,105
+BrainMap Sleuth,https://brainmap.org/sleuth/,Windows,109
+OsiriX (commercial),https://www.osirix-viewer.com/,macOS,118
+TractoFlow,https://github.com/scilus/tractoflow,Nextflow/Singularity,134

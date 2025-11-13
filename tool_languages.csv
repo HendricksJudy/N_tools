@@ -1,0 +1,134 @@
+Name,Languages,Platform,Row
+SPM,MATLAB,MATLAB (Win/macOS/Linux),2
+FSL,,Linux/macOS/Windows,3
+AFNI,,Linux/macOS,4
+FreeSurfer,,Linux/macOS,5
+ANTs,C++; Python,C++/Python,6
+MRtrix3,C++; Python,C++/Python,7
+DIPY,Python,Python,8
+NiPyPe,Python,Python,9
+Nilearn,Python,Python,10
+NiBabel,Python,Python,11
+REST,MATLAB,MATLAB,12
+DPABI,MATLAB,MATLAB,13
+RESTplus,MATLAB,MATLAB,14
+fMRIPrep,,Linux/Docker/Singularity,15
+QSIPrep,,Linux/Docker,16
+C-PAC,,Docker/Singularity,17
+BIDS Validator,Node.js,Node.js ,18
+BIDS Apps,,Docker/Singularity,19
+HeuDiConv,Python,Python/Docker,20
+DataLad,Python,Python,21
+OpenNeuro CLI,Node.js; Python,Node.js/Python,22
+NeuroDocker,,Docker/Singularity,23
+CAT12 (SPM),MATLAB,MATLAB/SPM,24
+VBM8 (legacy),MATLAB,MATLAB/SPM,25
+hMRI Toolbox,MATLAB,MATLAB/SPM,26
+qMRLab,MATLAB; Python,MATLAB/Python,27
+BrainSuite,,Windows/Linux,28
+ITK-SNAP,C++,C++/Qt ,29
+Elastix,C++,C++,30
+SimpleElastix,C++; Java; Python,C++/Python/Java,31
+SimpleITK,C++; Python,C++/Python,32
+ITK,C++,C++ ,33
+Mango,Java,Java ,34
+MRIcron,,Win/macOS/Linux,35
+Surfice,,Win/macOS/Linux,36
+FSLeyes,,Win/macOS/Linux,37
+Connectome Workbench,,Win/macOS/Linux,38
+CIVET,,Linux,39
+MINC Toolkit,,Linux/macOS,40
+MONAI,Python,Python/PyTorch,41
+DeepMedic,Python,Python/Theano,42
+nnU-Net,Python,Python/PyTorch,43
+SynthSeg,Python,Python/TensorFlow,44
+SynthSR,Python,Python/TensorFlow,45
+FastSurfer,Python,Python/PyTorch,46
+Mindboggle,Python,Python,47
+ROBEX,C++; MATLAB,C++/MATLAB,48
+ANTs BrainExtraction,,ANTs,49
+OPTiBET,MATLAB,MATLAB,50
+pydeface,Python,Python,51
+DTI-TK,,Linux/macOS,52
+TORTOISE,,Windows/Linux,53
+DSI Studio,,Windows/macOS/Linux,54
+TractSeg,Python,Python/PyTorch,55
+Recobundles,Python,Python,56
+SlicerDMRI,,3D Slicer,57
+AMICO/NODDI,MATLAB; Python,MATLAB/Python,58
+DMIPY,Python,Python,59
+MDT,Python,Python,60
+Brain Connectivity Toolbox (BCT),MATLAB; Python,MATLAB/Python,61
+GRETNA,MATLAB,MATLAB,62
+GraphVar,MATLAB,MATLAB,63
+BRAPH2,MATLAB,MATLAB,64
+NBS (Network-Based Statistic),MATLAB,MATLAB,65
+NBS-Predict,Python,Python,66
+NetworkX,Python,Python,67
+PALM,MATLAB,MATLAB/Linux,68
+SnPM (Statistical NonParametric Mapping),MATLAB,MATLAB/SPM,69
+MarsBaR,MATLAB,MATLAB/SPM,70
+BSPMview,MATLAB,MATLAB/SPM,71
+LIMO EEG,MATLAB,MATLAB/EEGLAB,72
+PhysIO (TAPAS),MATLAB,MATLAB/SPM,73
+CONN Toolbox,MATLAB,MATLAB/SPM,74
+GIFT (Group ICA),MATLAB,MATLAB,75
+ICA-AROMA,Python,Python,76
+FIX (FSL),MATLAB,MATLAB,77
+xcpEngine,,Linux,78
+fMRIflows,Python,Python,79
+CIFTIFY,,Linux/HC,80
+PyCortex,Python,Python/WebGL,81
+Nitime,Python,Python,82
+EEGLAB,MATLAB,MATLAB,83
+FieldTrip,MATLAB,MATLAB,84
+Brainstorm,MATLAB,MATLAB,85
+OpenMEEG,C++; MATLAB; Python,C++/MATLAB/Python,86
+sLORETA,,Windows,87
+BESA (commercial),,Windows,88
+CURRY (commercial),,Windows,89
+CARTOOL,,Windows,90
+MoBILAB,MATLAB,MATLAB,91
+BCILAB,MATLAB,MATLAB,92
+MNE-Python,Python,Python,93
+PMOD (commercial),,Windows/Linux,94
+AMIDE,,Linux/macOS/Windows,95
+NiftyPET,Python,Python/CUDA,96
+SIRF,C++; Python,Python/C++,97
+STIR,C++,C++,98
+LCModel (commercial),,Windows/Linux,99
+jMRUI,Java,Java,100
+TARQUIN,C++,C++,101
+FID-A,MATLAB,MATLAB,102
+Osprey,MATLAB,MATLAB,103
+GingerALE,,Win/Linux,104
+Seed-based d Mapping (AES-SDM),,Windows,105
+NeuroSynth,Python,Python/Web,106
+NeuroQuery,Python,Python/Web,107
+NiMARE,Python,Python,108
+BrainMap Sleuth,,Windows,109
+SurfStat,MATLAB,MATLAB,110
+Pydra (nipype2),Python,Python,111
+Snakebids,Python,Python/Snakemake,112
+BrainNet Viewer,MATLAB,MATLAB,113
+Connectome Viewer (legacy),Python,Python,114
+Brainrender,Python,Python,115
+Lead-DBS,MATLAB,MATLAB,116
+Lead-OR,MATLAB; Python,MATLAB/Python,117
+OsiriX (commercial),,macOS,118
+MIPAV,Java,Java,119
+Nilearn GLM,Python,Python,120
+StatsModels (neuro use),Python,Python,121
+RMINC,R,R/MINC,122
+ANTsR,R,R,123
+ANTsPy,Python,Python,124
+Clinica (ARAMIS),Python,Python,125
+The Virtual Brain (TVB),Python,Python,126
+BrainIAK,Python,Python,127
+NiTransforms,Python,Python,128
+Nibabies,Python,Python/Docker,129
+BrainSpace,MATLAB; Python,Python/MATLAB,130
+neuromaps,Python,Python,131
+abagen,Python,Python,132
+BrainStat,MATLAB; Python,Python/MATLAB,133
+TractoFlow,,Nextflow/Singularity,134

@@ -1,0 +1,134 @@
+Name,Website,Platform
+SPM,https://www.fil.ion.ucl.ac.uk/spm/,MATLAB (Win/macOS/Linux)
+FSL,https://fsl.fmrib.ox.ac.uk/,Linux/macOS/Windows
+AFNI,https://afni.nimh.nih.gov/,Linux/macOS
+FreeSurfer,https://surfer.nmr.mgh.harvard.edu/,Linux/macOS
+ANTs,http://stnava.github.io/ANTs/,C++/Python
+MRtrix3,https://www.mrtrix.org/,C++/Python
+DIPY,https://dipy.org/,Python
+NiPyPe,https://nipype.readthedocs.io/,Python
+Nilearn,https://nilearn.github.io/,Python
+NiBabel,https://nipy.org/nibabel/,Python
+REST,https://rfmri.org/REST,MATLAB
+DPABI,https://github.com/Chaogan-Yan/DPABI,MATLAB
+RESTplus,,MATLAB
+fMRIPrep,https://fmriprep.org/,Linux/Docker/Singularity
+QSIPrep,https://qsiprep.readthedocs.io/,Linux/Docker
+C-PAC,https://fcp-indi.github.io/,Docker/Singularity
+BIDS Validator,https://github.com/bids-standard/bids-validator,Node.js 
+BIDS Apps,https://bids-apps.neuroimaging.io/,Docker/Singularity
+HeuDiConv,https://github.com/nipy/heudiconv,Python/Docker
+DataLad,https://www.datalad.org/,Python
+OpenNeuro CLI,https://openneuro.org/,Node.js/Python
+NeuroDocker,https://github.com/ReproNim/neurodocker,Docker/Singularity
+CAT12 (SPM),http://www.neuro.uni-jena.de/cat/,MATLAB/SPM
+VBM8 (legacy),http://dbm.neuro.uni-jena.de/vbm/,MATLAB/SPM
+hMRI Toolbox,https://hmri.info/,MATLAB/SPM
+qMRLab,https://qmrlab.org/,MATLAB/Python
+BrainSuite,http://brainsuite.org/,Windows/Linux
+ITK-SNAP,http://www.itksnap.org/,C++/Qt 
+Elastix,https://elastix.lumc.nl/,C++
+SimpleElastix,https://simpleelastix.github.io/,C++/Python/Java
+SimpleITK,https://simpleitk.org/,C++/Python
+ITK,https://itk.org/,C++ 
+Mango,http://ric.uthscsa.edu/mango/,Java 
+MRIcron,https://people.cas.sc.edu/rorden/mricron/,Win/macOS/Linux
+Surfice,https://www.nitrc.org/projects/surfice/,Win/macOS/Linux
+FSLeyes,https://open.win.ox.ac.uk/pages/fsl/fsleyes/fsleyes.html,Win/macOS/Linux
+Connectome Workbench,https://www.humanconnectome.org/software/connectome-workbench,Win/macOS/Linux
+CIVET,https://www.bic.mni.mcgill.ca/ServicesSoftware/CIVET,Linux
+MINC Toolkit,https://bic-mni.github.io/,Linux/macOS
+MONAI,https://monai.io/,Python/PyTorch
+DeepMedic,https://deepmedic.org/,Python/Theano
+nnU-Net,https://github.com/MIC-DKFZ/nnUNet,Python/PyTorch
+SynthSeg,https://surfer.nmr.mgh.harvard.edu/fswiki/SynthSeg,Python/TensorFlow
+SynthSR,https://surfer.nmr.mgh.harvard.edu/fswiki/SynthSR,Python/TensorFlow
+FastSurfer,https://fastsurfer.github.io/,Python/PyTorch
+Mindboggle,http://mindboggle.info/,Python
+ROBEX,https://www.nitrc.org/projects/robex/,C++/MATLAB
+ANTs BrainExtraction,http://stnava.github.io/ANTs/,ANTs
+OPTiBET,https://www.nitrc.org/projects/optibet/,MATLAB
+pydeface,https://github.com/poldracklab/pydeface,Python
+DTI-TK,http://dti-tk.sourceforge.net/pmwiki/pmwiki.php,Linux/macOS
+TORTOISE,https://tortoise.nibib.nih.gov/,Windows/Linux
+DSI Studio,https://dsi-studio.labsolver.org/,Windows/macOS/Linux
+TractSeg,https://github.com/MIC-DKFZ/TractSeg,Python/PyTorch
+Recobundles,https://dipy.org/documentation/1.0.0./examples_built/recobundles/,Python
+SlicerDMRI,https://dmri.slicer.org/,3D Slicer
+AMICO/NODDI,https://github.com/daducci/AMICO,MATLAB/Python
+DMIPY,https://dmipy.readthedocs.io/,Python
+MDT,https://mdt-toolbox.readthedocs.io/,Python
+Brain Connectivity Toolbox (BCT),https://sites.google.com/site/bctnet/,MATLAB/Python
+GRETNA,https://www.nitrc.org/projects/gretna/,MATLAB
+GraphVar,https://www.nitrc.org/projects/graphvar/,MATLAB
+BRAPH2,http://braph.org/,MATLAB
+NBS (Network-Based Statistic),https://www.nitrc.org/projects/nbs/,MATLAB
+NBS-Predict,https://github.com/urostami/nbs-predict,Python
+NetworkX,https://networkx.org/,Python
+PALM,https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/PALM,MATLAB/Linux
+SnPM (Statistical NonParametric Mapping),http://warwick.ac.uk/snpm,MATLAB/SPM
+MarsBaR,http://marsbar.sourceforge.net/,MATLAB/SPM
+BSPMview,https://www.bspmview.com/,MATLAB/SPM
+LIMO EEG,https://github.com/LIMO-EEG-Toolbox/limo_eeg,MATLAB/EEGLAB
+PhysIO (TAPAS),https://tapas.gitlab.io/physio/,MATLAB/SPM
+CONN Toolbox,https://www.conn-toolbox.org/,MATLAB/SPM
+GIFT (Group ICA),https://trendscenter.org/software/gift/,MATLAB
+ICA-AROMA,https://github.com/maartenmennes/ICA-AROMA,Python
+FIX (FSL),https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FIX,MATLAB
+xcpEngine,https://xcpengine.readthedocs.io/,Linux
+fMRIflows,https://github.com/fMRIflows/fMRIflows,Python
+CIFTIFY,https://github.com/edickie/ciftify,Linux/HC
+PyCortex,https://gallantlab.github.io/pycortex/,Python/WebGL
+Nitime,https://nipy.org/nitime/,Python
+EEGLAB,https://sccn.ucsd.edu/eeglab/,MATLAB
+FieldTrip,https://www.fieldtriptoolbox.org/,MATLAB
+Brainstorm,https://neuroimage.usc.edu/brainstorm/,MATLAB
+OpenMEEG,https://openmeeg.github.io/,C++/MATLAB/Python
+sLORETA,http://www.uzh.ch/keyinst/loreta.htm,Windows
+BESA (commercial),https://www.besa.de/,Windows
+CURRY (commercial),https://compumedicsneuroscan.com/,Windows
+CARTOOL,https://sites.google.com/site/cartoolcommunity/,Windows
+MoBILAB,https://github.com/labstreaminglayer/App-MoBILAB,MATLAB
+BCILAB,https://sccn.ucsd.edu/wiki/BCILAB,MATLAB
+MNE-Python,https://mne.tools/,Python
+PMOD (commercial),https://www.pmod.com/,Windows/Linux
+AMIDE,http://amide.sourceforge.net/,Linux/macOS/Windows
+NiftyPET,https://niftypet.readthedocs.io/,Python/CUDA
+SIRF,https://www.ccppetmr.ac.uk/sites/sirf,Python/C++
+STIR,http://stir.sourceforge.net/,C++
+LCModel (commercial),http://www.lcmodel.com/,Windows/Linux
+jMRUI,http://www.jmrui.eu/,Java
+TARQUIN,https://tarquin.sourceforge.net/,C++
+FID-A,https://github.com/CIC-methods/FID-A,MATLAB
+Osprey,https://github.com/schorschinho/osprey,MATLAB
+GingerALE,https://brainmap.org/ale/,Win/Linux
+Seed-based d Mapping (AES-SDM),https://www.sdmproject.com/,Windows
+NeuroSynth,https://neurosynth.org/,Python/Web
+NeuroQuery,https://neuroquery.org/,Python/Web
+NiMARE,https://nimare.readthedocs.io/,Python
+BrainMap Sleuth,https://brainmap.org/sleuth/,Windows
+SurfStat,http://www.math.mcgill.ca/keith/surfstat/,MATLAB
+Pydra (nipype2),https://pydra.readthedocs.io/,Python
+Snakebids,https://github.com/akhanf/snakebids,Python/Snakemake
+BrainNet Viewer,https://www.nitrc.org/projects/bnv/,MATLAB
+Connectome Viewer (legacy),http://www.cmtk.org/viewer,Python
+Brainrender,https://github.com/BrancoLab/brainrender,Python
+Lead-DBS,https://www.lead-dbs.org/,MATLAB
+Lead-OR,https://github.com/netstim/lead-or,MATLAB/Python
+OsiriX (commercial),https://www.osirix-viewer.com/,macOS
+MIPAV,https://mipav.cit.nih.gov/,Java
+Nilearn GLM,https://nilearn.github.io/modules/generated/nilearn.glm.html,Python
+StatsModels (neuro use),https://www.statsmodels.org/,Python
+RMINC,https://github.com/Mouse-Imaging-Centre/RMINC,R/MINC
+ANTsR,https://github.com/ANTsX/ANTsR,R
+ANTsPy,https://github.com/ANTsX/ANTsPy,Python
+Clinica (ARAMIS),https://www.clinica.run/,Python
+The Virtual Brain (TVB),https://www.thevirtualbrain.org/,Python
+BrainIAK,https://brainiak.org/,Python
+NiTransforms,https://github.com/nipy/nitransforms,Python
+Nibabies,https://github.com/nipreps/nibabies,Python/Docker
+BrainSpace,https://brainspace.readthedocs.io/,Python/MATLAB
+neuromaps,https://netneurolab.github.io/neuromaps/,Python
+abagen,https://abagen.readthedocs.io/,Python
+BrainStat,https://brainstat.readthedocs.io/,Python/MATLAB
+TractoFlow,https://github.com/scilus/tractoflow,Nextflow/Singularity
