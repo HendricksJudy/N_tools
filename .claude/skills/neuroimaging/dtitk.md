@@ -2,542 +2,743 @@
 
 ## Overview
 
-DTI-TK (Diffusion Tensor Imaging ToolKit) is a specialized software package for spatial normalization and atlas construction of diffusion tensor images. Unlike standard registration methods that treat DTI as scalar images, DTI-TK preserves the full tensor information during registration using diffeomorphic transformations optimized for tensor data. This enables accurate population studies, voxel-based analysis, and atlas creation while maintaining the directional information critical for white matter analysis.
+DTI-TK (Diffusion Tensor Imaging ToolKit) is a specialized spatial normalization and atlas construction toolkit for diffusion tensor images (DTI). Developed by Gary Hui Zhang at UCL, DTI-TK performs tensor-based registration that directly optimizes tensor reorientation and alignment, rather than treating DTI as scalar images. This tensor-aware approach preserves the directional information in diffusion data, making it superior to scalar-based methods for DTI normalization, atlas construction, and voxel-based analysis of diffusion parameters.
 
 **Website:** http://dti-tk.sourceforge.net/
-**Platform:** Linux/macOS
-**Language:** C++
-**License:** Open Source
+**Platform:** Linux/macOS (command-line tools)
+**License:** Free for academic use
+**Key Application:** DTI registration, population template creation, tract-based analysis
+
+### Why Tensor-Based Registration?
+
+Traditional scalar registration (using FA or MD maps) has limitations:
+- **Loses directional information** - Tensors encode fiber orientation
+- **Suboptimal alignment** - Fiber tracts may not align properly
+- **Reduced sensitivity** - Misses subtle white matter changes
+
+DTI-TK addresses these by:
+- **Direct tensor matching** - Optimizes tensor similarity
+- **Proper tensor reorientation** - Preserves fiber directions during warping
+- **Better white matter alignment** - Aligns fiber bundles accurately
 
 ## Key Features
 
-- Tensor-based spatial normalization
-- Diffeomorphic registration preserving tensor orientation
-- Population-specific atlas construction
-- Inter-subject registration
-- Intra-subject registration (longitudinal)
-- Tensor reorientation during warping
-- Scalar maps (FA, MD, etc.) generation
-- Integration with other DTI tools
-- Command-line interface
-- Supports NIfTI format
-- Affine and deformable registration
+- **Tensor-based registration** - Directly registers full diffusion tensors
+- **Preservation of Principal Direction (PPD)** - Maintains fiber orientation during warping
+- **Population template construction** - Create study-specific DTI atlases
+- **Affine and deformable registration** - Multi-stage pipeline
+- **Diffeomorphic transforms** - Smooth, invertible deformations
+- **Tensor reorientation** - Proper handling of directional data
+- **TBSS-style analysis** - Voxel-based stats on aligned DTI
+- **Quality control tools** - Assess registration accuracy
+- **Fast processing** - Optimized C++ implementation
+- **Well-validated** - Published and widely used
+- **Command-line interface** - Scriptable and reproducible
+- **Format support** - NIFTI input/output
 
 ## Installation
 
-### Download and Install
+### Linux Installation
 
-```bash
-# Download from: http://dti-tk.sourceforge.net/pmwiki/pmwiki.php?n=Main.Download
+\`\`\`bash
+# Download DTI-TK
+cd ~/software
+wget http://dti-tk.sourceforge.net/pmwiki/uploads/DTI-TK/dtitk_2.3.1_Linux_x86_64.tar.gz
 
-# Linux
-tar -xzf dtitk*.tar.gz
-cd dtitk
+# Extract
+tar -xzf dtitk_2.3.1_Linux_x86_64.tar.gz
+cd dtitk-2.3.1-Linux-x86_64
 
 # Add to PATH
-export PATH=/path/to/dtitk/bin:${PATH}
-export DTITK_ROOT=/path/to/dtitk
+echo 'export PATH=$HOME/software/dtitk-2.3.1-Linux-x86_64/bin:$PATH' >> ~/.bashrc
+source ~/.bashrc
 
-# Add to ~/.bashrc for persistence
-echo 'export PATH=/path/to/dtitk/bin:${PATH}' >> ~/.bashrc
-echo 'export DTITK_ROOT=/path/to/dtitk' >> ~/.bashrc
-
-# Verify installation
-dti_rigid_reg --help
-TVtool -h
-```
+# Add library path
+echo 'export LD_LIBRARY_PATH=$HOME/software/dtitk-2.3.1-Linux-x86_64/lib:$LD_LIBRARY_PATH' >> ~/.bashrc
+source ~/.bashrc
+\`\`\`
 
 ### macOS Installation
 
-```bash
+\`\`\`bash
 # Download macOS version
-tar -xzf dtitk_macos*.tar.gz
+cd ~/software
+wget http://dti-tk.sourceforge.net/pmwiki/uploads/DTI-TK/dtitk_2.3.1_MacOSX_x86_64.tar.gz
 
-# Same PATH setup as above
-export PATH=/path/to/dtitk/bin:${PATH}
+# Extract and setup
+tar -xzf dtitk_2.3.1_MacOSX_x86_64.tar.gz
+cd dtitk-2.3.1-MacOSX_x86_64
 
-# May need to allow in Security & Privacy settings
-```
+# Add to PATH
+echo 'export PATH=$HOME/software/dtitk-2.3.1-MacOSX_x86_64/bin:$PATH' >> ~/.bash_profile
+source ~/.bash_profile
 
-## Data Preparation
+# Add library path
+echo 'export DYLD_LIBRARY_PATH=$HOME/software/dtitk-2.3.1-MacOSX_x86_64/lib:$DYLD_LIBRARY_PATH' >> ~/.bash_profile
+source ~/.bash_profile
+\`\`\`
 
-### Input Requirements
+### Verify Installation
 
-```bash
-# DTI-TK requires:
-# 1. DTI tensor images (6 independent components)
-# 2. Or separate files for each component
+\`\`\`bash
+# Check installation
+dti_rigid_reg --version
 
-# Preprocessing steps:
-# - Motion/eddy correction
-# - Tensor fitting
-# - Brain extraction
-# - Convert to DTI-TK format
-```
+# List available commands
+ls ~/software/dtitk-*/bin/
 
-### Convert from FSL to DTI-TK
+# Should see:
+# dti_rigid_reg, dti_affine_reg, dti_diffeomorphic_reg
+# TVtool, dfRightComposeAffine, etc.
+\`\`\`
 
-```bash
-# FSL dtifit outputs:
-# - dti_V1.nii.gz (first eigenvector)
-# - dti_L1.nii.gz, dti_L2.nii.gz, dti_L3.nii.gz (eigenvalues)
-# - dti_FA.nii.gz, dti_MD.nii.gz
+## DTI Data Preparation
 
-# Reconstruct tensor from FSL outputs
-fsl_to_dtitk \
-  dti_L1.nii.gz dti_L2.nii.gz dti_L3.nii.gz \
-  dti_V1.nii.gz dti_V2.nii.gz dti_V3.nii.gz \
-  dti_tensor.nii.gz
+### Convert from FSL Format
 
-# Or use DTI-TK's own fitting
-dti_fit_tensor dwi.nii.gz bvecs bvals output_tensor.nii.gz
-```
+DTI-TK uses NIFTI format with specific tensor encoding:
 
-### Tensor File Format
+\`\`\`bash
+# FSL dtifit output: dti_V1, dti_V2, dti_V3, dti_L1, dti_L2, dti_L3
+# Convert to DTI-TK format (6 component: Dxx, Dxy, Dxz, Dyy, Dyz, Dzz)
 
-```bash
-# DTI-TK tensor format (NIfTI with 6 volumes):
-# Volume 1: Dxx
-# Volume 2: Dxy
-# Volume 3: Dxz
-# Volume 4: Dyy
-# Volume 5: Dyz
-# Volume 6: Dzz
+# Use fsl_to_dtitk (if available) or manual conversion
+# Assuming you have: dti_FA.nii.gz, dti_MD.nii.gz, dti_tensor.nii.gz
 
-# Check tensor file
-TVtool -in tensor.nii.gz -tr
+# DTI-TK expects tensor in specific order
+# This is usually handled by the fitting tool
+\`\`\`
 
-# Generate scalar maps from tensor
+### From DIPY/MRtrix3
+
+\`\`\`bash
+# If using DIPY or MRtrix3 for tensor fitting:
+
+# MRtrix3:
+dwi2tensor dwi.mif -fslgrad bvecs bvals tensor.mif
+mrconvert tensor.mif tensor.nii.gz
+
+# DIPY (Python):
+# Use dipy.io.save_nifti to save tensors
+# Ensure proper ordering for DTI-TK
+\`\`\`
+
+### Create Scalar Maps
+
+\`\`\`bash
+# Extract FA, MD, AD, RD from tensor
+# DTI-TK provides TVtool
+
 TVtool -in tensor.nii.gz -fa
-# Creates tensor_fa.nii.gz
+# Output: tensor_fa.nii.gz
 
 TVtool -in tensor.nii.gz -tr
-# Creates tensor_tr.nii.gz (trace/MD)
-```
+# Output: tensor_tr.nii.gz (trace / mean diffusivity × 3)
 
-## Single Subject Registration
+TVtool -in tensor.nii.gz -ad
+# Output: tensor_ad.nii.gz (axial diffusivity)
 
-### Rigid Registration
+TVtool -in tensor.nii.gz -rd
+# Output: tensor_rd.nii.gz (radial diffusivity)
+\`\`\`
 
-```bash
-# Rigid alignment to template
-dti_rigid_reg \
-  template.nii.gz \
-  subject_tensor.nii.gz \
-  EDS 4 4 4 0.01
+## Inter-Subject Registration
 
-# Parameters:
-#   template.nii.gz: Target template
-#   subject_tensor.nii.gz: Moving tensor image
-#   EDS: Euclidean Distance Squared similarity metric
-#   4 4 4: Multi-resolution levels (x,y,z)
-#   0.01: Tolerance
+### Step 1: Rigid Registration
 
-# Output: subject_tensor_aff.nii.gz
-#         subject_tensor.aff (affine transform)
-```
+Align tensors using rigid transformation (6 DOF):
 
-### Affine Registration
+\`\`\`bash
+# Rigid registration between two subjects
+dti_rigid_reg \\
+  template_tensor.nii.gz \\
+  subject01_tensor.nii.gz \\
+  EDS \\
+  4 4 4 \\
+  0.01
 
-```bash
-# Affine (12 DOF) registration
-dti_affine_reg \
-  template.nii.gz \
-  subject_tensor_aff.nii.gz \
-  EDS 4 4 4 0.01 1
+# Arguments:
+# - template_tensor.nii.gz: target/fixed tensor image
+# - subject01_tensor.nii.gz: moving tensor image
+# - EDS: similarity metric (Euclidean Distance Squared of tensors)
+# - 4 4 4: resampling resolution (mm)
+# - 0.01: convergence threshold
 
-# Last parameter (1) = use previous rigid as initialization
+# Output:
+# - subject01_tensor_aff.nii.gz: registered tensor
+# - subject01_tensor.aff: affine transformation
+\`\`\`
 
-# Output: subject_tensor_aff_aff.nii.gz
-#         subject_tensor_aff.aff
-```
+### Step 2: Affine Registration
 
-### Deformable Registration
+Add scaling and shearing (12 DOF):
 
-```bash
-# Non-linear diffeomorphic registration
-dti_diffeomorphic_reg \
-  template.nii.gz \
-  subject_tensor_aff_aff.nii.gz \
-  mask.nii.gz \
-  1 6 0.002
+\`\`\`bash
+# Affine registration (starts from rigid result)
+dti_affine_reg \\
+  template_tensor.nii.gz \\
+  subject01_tensor \\
+  EDS \\
+  4 4 4 \\
+  0.01 \\
+  1
 
-# Parameters:
-#   template.nii.gz: Template
-#   subject: Affine-aligned subject
-#   mask: Template brain mask
-#   1: Use full tensor (vs 0 for FA only)
-#   6: Number of iterations
-#   0.002: Step size
+# Last argument:
+# 1 = start from existing affine (.aff file)
+# 0 = start from scratch
 
-# Output: subject_tensor_aff_aff_diffeo.nii.gz
-#         subject_tensor_aff_aff_diffeo.df.nii.gz (deformation field)
-```
+# Output:
+# - subject01_tensor_aff.nii.gz: affine-registered tensor
+# - subject01_tensor.aff: updated affine transform
+\`\`\`
 
-### Complete Single-Subject Pipeline
+### Step 3: Deformable Registration
 
-```bash
+High-dimensional diffeomorphic registration:
+
+\`\`\`bash
+# Deformable registration
+dti_diffeomorphic_reg \\
+  template_tensor.nii.gz \\
+  subject01_tensor_aff \\
+  subject01_template \\
+  0.002
+
+# Arguments:
+# - template_tensor.nii.gz: target
+# - subject01_tensor_aff: input (after affine)
+# - subject01_template: output prefix
+# - 0.002: convergence threshold
+
+# Output:
+# - subject01_template.nii.gz: deformably registered tensor
+# - subject01_template_diffeo.df.nii.gz: deformation field
+
+# This can take 30-60 minutes per subject
+\`\`\`
+
+### Complete Pipeline Script
+
+\`\`\`bash
 #!/bin/bash
-# Register subject to template
+# register_subject_to_template.sh
 
-TEMPLATE="IXI_template.nii.gz"
-SUBJECT="sub-01_tensor.nii.gz"
-MASK="template_mask.nii.gz"
+template=$1
+subject=$2
+output_prefix=$3
 
-# 1. Rigid
-echo "Rigid registration..."
-dti_rigid_reg ${TEMPLATE} ${SUBJECT} EDS 4 4 4 0.01
+echo "Registering ${subject} to ${template}..."
 
-# 2. Affine
-echo "Affine registration..."
-dti_affine_reg ${TEMPLATE} ${SUBJECT}_aff.nii.gz EDS 4 4 4 0.01 1
+# Step 1: Rigid
+echo "  Rigid registration..."
+dti_rigid_reg ${template} ${subject} EDS 4 4 4 0.01
 
-# 3. Deformable
-echo "Deformable registration..."
-dti_diffeomorphic_reg ${TEMPLATE} ${SUBJECT}_aff_aff.nii.gz ${MASK} 1 6 0.002
+# Step 2: Affine
+echo "  Affine registration..."
+dti_affine_reg ${template} ${subject} EDS 4 4 4 0.01 1
 
-# Final output
-FINAL="${SUBJECT}_aff_aff_diffeo.nii.gz"
-echo "Registration complete: ${FINAL}"
+# Step 3: Deformable
+echo "  Deformable registration..."
+dti_diffeomorphic_reg ${template} ${subject}_aff ${output_prefix} 0.002
 
-# Generate FA from registered tensor
-TVtool -in ${FINAL} -fa
-```
+echo "Registration complete!"
+echo "Output: ${output_prefix}.nii.gz"
+\`\`\`
 
-## Population Atlas Construction
+## Population Template Construction
 
-### Create Study-Specific Template
+### Create Study-Specific Atlas
 
-```bash
+Build DTI template from your subjects:
+
+\`\`\`bash
+# Create list of subject tensors
+ls /data/subjects/sub-*_tensor.nii.gz > tensor_list.txt
+
+# Initialize template bootstrap
+# Use one subject as initial template, or create mean
+dti_mean_template \\
+  tensor_list.txt \\
+  initial_template.nii.gz
+
+# Or use a subject:
+cp /data/subjects/sub-01_tensor.nii.gz initial_template.nii.gz
+\`\`\`
+
+### Iterative Template Refinement
+
+\`\`\`bash
 #!/bin/bash
-# Build population template from multiple subjects
+# build_population_template.sh
 
-# Subject list
-SUBJECTS=(
-  sub-01_tensor.nii.gz
-  sub-02_tensor.nii.gz
-  sub-03_tensor.nii.gz
-  sub-04_tensor.nii.gz
-  sub-05_tensor.nii.gz
-)
+template_list="tensor_list.txt"
+n_iterations=6
 
-# 1. Bootstrap: rigidly align all to first subject
-TEMPLATE=${SUBJECTS[0]}
+# Read subject list
+subjects=($(cat ${template_list}))
+n_subjects=${#subjects[@]}
 
-for subj in "${SUBJECTS[@]}"; do
-    dti_rigid_reg ${TEMPLATE} ${subj} EDS 4 4 4 0.01
-done
+echo "Building template from ${n_subjects} subjects"
 
-# 2. Initial mean
-TVMean -in ${SUBJECTS[@]/%/_aff.nii.gz} -out mean_initial.nii.gz
+# Initialize with mean or first subject
+echo "Creating initial template..."
+dti_mean_template ${template_list} mean_template0.nii.gz
 
-# 3. Iterative template construction
-for iter in {1..5}; do
-    echo "Iteration ${iter}..."
+# Iterative refinement
+for iter in $(seq 1 ${n_iterations}); do
+    echo "Iteration ${iter}/${n_iterations}..."
 
-    TEMPLATE="mean_iteration${iter}.nii.gz"
+    prev_iter=$((iter - 1))
+    template="mean_template${prev_iter}.nii.gz"
 
-    # Affine register all to current template
-    for subj in "${SUBJECTS[@]}"; do
-        dti_affine_reg ${TEMPLATE} ${subj}_aff.nii.gz EDS 4 4 4 0.01 1
+    # Register all subjects to current template
+    for i in $(seq 0 $((n_subjects - 1))); do
+        subj=${subjects[$i]}
+        subj_name=$(basename ${subj} _tensor.nii.gz)
+
+        echo "  Registering ${subj_name}..."
+
+        # Rigid + Affine
+        dti_rigid_reg ${template} ${subj} EDS 4 4 4 0.01
+        dti_affine_reg ${template} ${subj} EDS 4 4 4 0.01 1
+
+        # Deformable
+        dti_diffeomorphic_reg ${template} ${subj}_aff \\
+          ${subj_name}_iter${iter} 0.002
     done
 
-    # Deformable registration
-    for subj in "${SUBJECTS[@]}"; do
-        dti_diffeomorphic_reg \
-          ${TEMPLATE} \
-          ${subj}_aff_aff.nii.gz \
-          template_mask.nii.gz \
-          1 6 0.002
-    done
+    # Compute new template (mean of warped subjects)
+    ls *_iter${iter}.nii.gz > warped_list_iter${iter}.txt
+    dti_mean_template warped_list_iter${iter}.txt \\
+      mean_template${iter}.nii.gz
 
-    # Compute mean
-    TVMean -in ${SUBJECTS[@]/%/_aff_aff_diffeo.nii.gz} \
-      -out mean_iteration$((iter+1)).nii.gz
-
+    echo "Iteration ${iter} complete"
 done
 
-# Final template
-cp mean_iteration6.nii.gz study_template_final.nii.gz
-```
+echo "Final template: mean_template${n_iterations}.nii.gz"
+\`\`\`
 
-### Automated Template Building
+## Applying Transformations
 
-```bash
-# Use DTI-TK's automated script
-dti_template_bootstrap \
-  subjects_list.txt \
-  EDS 1
+### Transform Additional Images
 
-# subjects_list.txt contains paths to all tensor files
+Apply computed transformations to other modalities:
 
-# Then refine template
-dti_template_refine \
-  subjects_list.txt \
-  template_mask.nii.gz \
-  6 \
-  study_template_final.nii.gz
+\`\`\`bash
+# After registration, apply transform to FA map
 
-# This automates the iterative process
-```
+# 1. Affine transform
+dfRightComposeAffine \\
+  -aff subject01_tensor.aff \\
+  -in subject01_FA.nii.gz \\
+  -out subject01_FA_aff.nii.gz
 
-## Apply Transformations
+# 2. Deformable transform
+deformationSymTensor3DVolume \\
+  -in subject01_tensor_aff.nii.gz \\
+  -trans subject01_template_diffeo.df.nii.gz \\
+  -target template_tensor.nii.gz \\
+  -out subject01_tensor_def.nii.gz
 
-### Warp Scalar Maps
+# For scalar images (FA, MD):
+deformationScalarVolume \\
+  -in subject01_FA_aff.nii.gz \\
+  -trans subject01_template_diffeo.df.nii.gz \\
+  -target template_FA.nii.gz \\
+  -out subject01_FA_registered.nii.gz
+\`\`\`
 
-```bash
-# After registration, apply transforms to FA/MD maps
+### Compose Transformations
 
-# Generate FA from original tensor
-TVtool -in subject_tensor.nii.gz -fa
+\`\`\`bash
+# Combine affine and deformable into single transform
+dfComposition \\
+  -df1 subject01_template_diffeo.df.nii.gz \\
+  -aff subject01_tensor.aff \\
+  -out subject01_combined.df.nii.gz
 
-# Apply same transform to FA
-deformationSymTensor3DVolume \
-  -in subject_tensor_fa.nii.gz \
-  -trans subject_tensor_aff.aff \
-  -target template.nii.gz \
-  -out subject_fa_in_template_space.nii.gz
-
-# For deformation field
-deformationSymTensor3DVolume \
-  -in subject_tensor_fa.nii.gz \
-  -trans subject_tensor_aff_aff_diffeo.df.nii.gz \
-  -target template.nii.gz \
-  -out subject_fa_warped.nii.gz
-```
-
-### Warp Tensors
-
-```bash
-# Warp tensors with proper reorientation
-deformationSymTensor3DVolume \
-  -in subject_tensor.nii.gz \
-  -trans subject_transform.df.nii.gz \
-  -target template.nii.gz \
-  -out subject_tensor_warped.nii.gz
-
-# This preserves tensor orientation during warping
-```
-
-## Tract-Based Spatial Statistics (TBSS) Alternative
-
-### DTI-TK TBSS Workflow
-
-```bash
-# DTI-TK can create skeleton for TBSS-like analysis
-
-# 1. Register all subjects to template
-for subj in sub-*_tensor.nii.gz; do
-    ./register_to_template.sh ${subj}
-done
-
-# 2. Create mean FA in template space
-fslmaths sub-01_fa_warped.nii.gz -add sub-02_fa_warped.nii.gz \
-  -add sub-03_fa_warped.nii.gz [...]  \
-  -div 20 mean_FA_template_space.nii.gz
-
-# 3. Create skeleton
-tbss_skeleton -i mean_FA_template_space.nii.gz \
-  -o mean_FA_skeleton.nii.gz
-
-# 4. Project subjects to skeleton
-for subj_fa in *_fa_warped.nii.gz; do
-    tbss_skeleton -i mean_FA_template_space.nii.gz \
-      -p 0.2 mean_FA_skeleton.nii.gz \
-      ${subj_fa} ${subj_fa/.nii.gz/_skeletonised.nii.gz}
-done
-```
+# Apply combined transform
+deformationScalarVolume \\
+  -in subject01_FA.nii.gz \\
+  -trans subject01_combined.df.nii.gz \\
+  -target template_FA.nii.gz \\
+  -out subject01_FA_final.nii.gz
+\`\`\`
 
 ## Voxel-Based Analysis
 
-### Group Comparison
+### Prepare Data for Statistics
 
-```bash
-# After registering all subjects to common space
+\`\`\`bash
+#!/bin/bash
+# Normalize all subjects to template and extract FA
 
-# Prepare 4D images for randomise
-fslmerge -t controls_FA.nii.gz controls/*_fa_warped.nii.gz
-fslmerge -t patients_FA.nii.gz patients/*_fa_warped.nii.gz
+template="population_template.nii.gz"
+output_dir="/data/normalized"
 
-# Create design matrix
-design_ttest2 design 10 10
+mkdir -p ${output_dir}
 
-# Run permutation testing
-randomise -i all_FA.nii.gz \
-  -o tbss_FA \
-  -d design.mat \
-  -t design.con \
-  -m mean_FA_mask.nii.gz \
-  -n 5000 \
-  --T2
+for subj in /data/subjects/sub-*_tensor.nii.gz; do
+    subj_id=$(basename ${subj} _tensor.nii.gz)
 
-# View results
-fsleyes template.nii.gz \
-  tbss_FA_tfce_corrp_tstat1.nii.gz -cm red-yellow -dr 0.95 1
-```
+    echo "Processing ${subj_id}..."
 
-## Longitudinal Analysis
+    # Register to template (rigid → affine → deformable)
+    dti_rigid_reg ${template} ${subj} EDS 4 4 4 0.01
+    dti_affine_reg ${template} ${subj} EDS 4 4 4 0.01 1
+    dti_diffeomorphic_reg ${template} ${subj}_aff ${subj_id}_norm 0.002
 
-### Within-Subject Registration
+    # Extract FA from registered tensor
+    TVtool -in ${subj_id}_norm.nii.gz -fa
+    mv ${subj_id}_norm_fa.nii.gz ${output_dir}/${subj_id}_FA_norm.nii.gz
 
-```bash
-# Register timepoint 2 to timepoint 1
-dti_diffeomorphic_reg \
-  sub-01_tp1_tensor.nii.gz \
-  sub-01_tp2_tensor.nii.gz \
-  subject_mask.nii.gz \
-  1 6 0.002
+    # Extract MD
+    TVtool -in ${subj_id}_norm.nii.gz -tr
+    # MD = trace / 3
+    fslmaths ${subj_id}_norm_tr.nii.gz -div 3 ${output_dir}/${subj_id}_MD_norm.nii.gz
 
-# Measure changes
-# Compare tensors, FA, etc. between timepoints
+    echo "${subj_id} complete"
+done
 
-# Jacobian determinant (volume change)
-deformationJacobianVolume \
-  sub-01_tp2_tensor_diffeo.df.nii.gz \
-  jacobian.nii.gz
+echo "All subjects normalized. Ready for voxel-based analysis."
+\`\`\`
 
-# Values > 1: expansion
-# Values < 1: contraction
-```
+### Statistical Analysis with FSL
 
-## Utilities
+\`\`\`bash
+# After normalization, use FSL randomise for statistics
 
-### Tensor Math
+# Create 4D volume of all subject FA maps
+fslmerge -t all_FA_4D.nii.gz /data/normalized/*_FA_norm.nii.gz
 
-```bash
-# Compute FA, MD, etc.
-TVtool -in tensor.nii.gz -fa
-TVtool -in tensor.nii.gz -tr  # Trace (3*MD)
-TVtool -in tensor.nii.gz -ad  # Axial diffusivity
-TVtool -in tensor.nii.gz -rd  # Radial diffusivity
+# Create design matrix (FSL Glm)
+# E.g., two-group comparison
 
-# Reorient tensor
-TVtool -in tensor.nii.gz -reorient affine.aff -out tensor_reoriented.nii.gz
+# Run randomise
+randomise \\
+  -i all_FA_4D.nii.gz \\
+  -o tbss \\
+  -d design.mat \\
+  -t design.con \\
+  -m mean_FA_mask.nii.gz \\
+  -n 5000 \\
+  -T
 
-# Smooth tensor
-TVtool -in tensor.nii.gz -smooth 2.0 -out tensor_smooth.nii.gz
-```
+# Results: tbss_tstat*.nii.gz, tbss_tfce_corrp_*.nii.gz
+\`\`\`
 
-### Quality Control
+## Quality Control
 
-```bash
-# Check tensor validity
-TVtool -in tensor.nii.gz -check
+### Visual Inspection
 
-# Visualize principal eigenvector
-TVtool -in tensor.nii.gz -vec
+\`\`\`bash
+# Generate FA from registered tensors for visual QC
+for tensor in *_registered.nii.gz; do
+    TVtool -in ${tensor} -fa
+done
 
-# Compute tensor determinant (detect negative eigenvalues)
-TVtool -in tensor.nii.gz -det
-```
+# View in FSLeyes or ITK-SNAP
+# Check alignment of fiber bundles
+\`\`\`
 
-## Integration with Other Tools
+### Quantitative Metrics
 
-### Export to MRtrix3
+\`\`\`bash
+# Compute overlap of white matter masks
 
-```bash
-# Convert DTI-TK tensor to MRtrix format
-# (requires custom script or manual conversion)
+# 1. Create WM mask from template FA
+fslmaths template_FA.nii.gz -thr 0.2 -bin template_WM_mask.nii.gz
 
-# Alternative: use MRtrix for preprocessing, DTI-TK for registration
-```
+# 2. Create subject WM mask
+fslmaths subject01_FA_registered.nii.gz -thr 0.2 -bin subject01_WM_mask.nii.gz
 
-### Use with FSL
+# 3. Compute Dice coefficient
+fslmaths template_WM_mask.nii.gz -mul subject01_WM_mask.nii.gz overlap.nii.gz
+overlap=$(fslstats overlap.nii.gz -V | awk '{print $1}')
+template_vol=$(fslstats template_WM_mask.nii.gz -V | awk '{print $1}')
+subject_vol=$(fslstats subject01_WM_mask.nii.gz -V | awk '{print $1}')
 
-```bash
-# Register FA images using FSL
-# Then apply to tensors using DTI-TK
+dice=$(echo "scale=4; 2 * ${overlap} / (${template_vol} + ${subject_vol})" | bc)
+echo "Dice coefficient: ${dice}"
+# Good registration: Dice > 0.8
+\`\`\`
 
-# Or vice versa:
-# Register tensors with DTI-TK
-# Apply to other modalities with FSL
-```
+### Tensor Similarity
+
+\`\`\`bash
+# Measure tensor similarity in overlapping regions
+# Use DTI-TK's tensor comparison tools
+
+TVFromEigenSystem \\
+  -basename1 subject01_registered \\
+  -basename2 template \\
+  -out tensor_diff.nii.gz
+
+# Compute mean difference
+fslstats tensor_diff.nii.gz -M
+\`\`\`
 
 ## Integration with Claude Code
 
-When helping users with DTI-TK:
+DTI-TK workflows integrate well with Claude-assisted pipelines:
 
-1. **Check Installation:**
-   ```bash
-   which dti_rigid_reg
-   TVtool -h
-   ```
+### Automated Template Construction
 
-2. **Common Issues:**
-   - Tensor format incorrect (need 6 volumes)
-   - Missing brain mask for deformable registration
-   - Insufficient iterations for convergence
-   - Memory errors with large datasets
-   - Negative eigenvalues in tensors
+\`\`\`markdown
+**Prompt to Claude:**
+"Create a DTI-TK pipeline to build a population template:
+1. Start from 30 subjects with DTI tensors
+2. Perform 6 iterations of template refinement
+3. Track registration quality (Dice) at each iteration
+4. Generate QC report with FA alignment images
+5. Parallelize subject registration using GNU parallel
+Include error handling and progress logging."
+\`\`\`
 
-3. **Best Practices:**
-   - Always start with rigid → affine → deformable
-   - Use study-specific templates when possible
-   - Visual QC at each registration step
-   - Check tensor validity after warping
-   - Document all registration parameters
-   - Save transformation files for reproducibility
-   - Use consistent preprocessing across subjects
+### Tract-Based Analysis
 
-4. **Parameter Guidelines:**
-   - Multi-resolution: 4 4 4 (standard)
-   - Tolerance: 0.01 (rigid/affine)
-   - Step size: 0.002 (deformable)
-   - Iterations: 6 (minimum for deformable)
+\`\`\`markdown
+**Prompt to Claude:**
+"Set up DTI-TK + FSL pipeline for TBSS-style analysis:
+1. Register all subjects to study template
+2. Extract FA, MD, AD, RD maps
+3. Create white matter skeleton
+4. Project metrics onto skeleton
+5. Run randomise for group comparison
+6. Generate results summary with cluster tables
+Provide complete bash scripts."
+\`\`\`
+
+### Quality Control Automation
+
+\`\`\`markdown
+**Prompt to Claude:**
+"Generate DTI-TK QC script that:
+1. Computes Dice for all registered subjects
+2. Creates before/after registration mosaics
+3. Plots FA value distributions
+4. Identifies outliers (Dice < 0.75)
+5. Generates HTML report
+Include visualization code."
+\`\`\`
+
+## Integration with Other Tools
+
+### MRtrix3
+
+\`\`\`bash
+# Use MRtrix3 for preprocessing, DTI-TK for registration
+
+# 1. MRtrix3: Preprocessing and tensor fitting
+dwi2tensor dwi_preprocessed.mif -fslgrad bvecs bvals -mask mask.mif tensor.mif
+tensor2metric tensor.mif -fa FA.mif -adc MD.mif
+
+# Convert to NIfTI for DTI-TK
+mrconvert tensor.mif tensor.nii.gz
+mrconvert FA.mif FA.nii.gz
+
+# 2. DTI-TK: Registration
+dti_rigid_reg template.nii.gz tensor.nii.gz EDS 4 4 4 0.01
+# ... continue with affine and deformable
+
+# 3. Back to MRtrix3: Tractography in template space
+mrconvert tensor_registered.nii.gz tensor_registered.mif
+tckgen tensor_registered.mif tracks.tck -algorithm iFOD2
+\`\`\`
+
+### FSL
+
+\`\`\`bash
+# FSL dtifit → DTI-TK registration → FSL statistics
+
+# 1. FSL: Tensor fitting
+dtifit -k dwi.nii.gz -o dti -m mask.nii.gz -r bvecs -b bvals
+
+# 2. Convert FSL to DTI-TK format (manual tensor construction)
+# DTI-TK expects: Dxx, Dxy, Dxz, Dyy, Dyz, Dzz
+
+# 3. DTI-TK: Registration
+dti_rigid_reg template.nii.gz dti_tensor.nii.gz EDS 4 4 4 0.01
+
+# 4. FSL: TBSS or randomise
+# Use registered FA maps
+\`\`\`
+
+### DIPY
+
+\`\`\`python
+import numpy as np
+import nibabel as nib
+from dipy.io.image import save_nifti
+
+# Fit tensor with DIPY
+# ... (tensor fitting code)
+
+# Save in format for DTI-TK
+# Ensure proper tensor component ordering
+tensor_data = np.stack([
+    tensor_fit.quadratic_form[:,:,:,0,0],  # Dxx
+    tensor_fit.quadratic_form[:,:,:,0,1],  # Dxy
+    tensor_fit.quadratic_form[:,:,:,0,2],  # Dxz
+    tensor_fit.quadratic_form[:,:,:,1,1],  # Dyy
+    tensor_fit.quadratic_form[:,:,:,1,2],  # Dyz
+    tensor_fit.quadratic_form[:,:,:,2,2],  # Dzz
+], axis=-1)
+
+save_nifti('tensor_for_dtitk.nii.gz', tensor_data, affine)
+\`\`\`
 
 ## Troubleshooting
 
-**Problem:** Registration fails to converge
-**Solution:** Increase iterations, adjust step size, check initial alignment quality
+### Problem 1: Registration Diverges
 
-**Problem:** Tensors have negative eigenvalues after warping
-**Solution:** Check original tensor validity, reduce deformation smoothness, use smaller step size
+**Symptoms:** Very poor alignment, extreme warping
 
-**Problem:** Results look over-smoothed
-**Solution:** Reduce number of iterations, increase step size, use sparser grid
+**Solutions:**
+\`\`\`bash
+# Use smaller convergence threshold
+dti_diffeomorphic_reg template.nii.gz subject_aff output 0.001  # Was 0.002
 
-**Problem:** Memory errors
-**Solution:** Downsample images, process in batches, increase system RAM
+# Better initialization with affine
+dti_affine_reg template.nii.gz subject EDS 2 2 2 0.001 1  # Finer resolution
 
-**Problem:** Misalignment after registration
-**Solution:** Check rigid/affine initialization, verify similar contrast between images, use appropriate mask
+# Check input data quality
+TVtool -in subject.nii.gz -fa
+# Ensure FA looks reasonable (0-1 range, clear WM structure)
+\`\`\`
+
+### Problem 2: Out of Memory
+
+**Symptoms:** Process killed during deformable registration
+
+**Solutions:**
+\`\`\`bash
+# Use coarser resolution during registration
+dti_rigid_reg template.nii.gz subject.nii.gz EDS 6 6 6 0.01  # Was 4 4 4
+
+# Downsample tensors first
+# (Requires custom scripting or external tools)
+
+# Run on machine with more RAM
+# Deformable registration can use 8-16 GB
+\`\`\`
+
+### Problem 3: Tensor Reorientation Issues
+
+**Symptoms:** Incorrect fiber directions after registration
+
+**Solutions:**
+\`\`\`bash
+# Ensure using tensor-specific transforms
+deformationSymTensor3DVolume -in tensor.nii.gz ...
+# NOT deformationScalarVolume (which doesn't reorient)
+
+# Verify tensor eigenvectors
+TVtool -in registered_tensor.nii.gz -eig
+# Check that V1 directions make anatomical sense
+\`\`\`
+
+### Problem 4: Template Construction Slow
+
+**Symptoms:** Template building takes days
+
+**Solutions:**
+\`\`\`bash
+# Reduce number of iterations
+# 3-4 iterations often sufficient instead of 6
+
+# Parallelize subject registrations
+# Use GNU parallel for multi-subject processing
+
+parallel -j 4 \\
+  'dti_rigid_reg template.nii.gz {} EDS 4 4 4 0.01' \\
+  ::: subjects/*.nii.gz
+
+# Use cluster/HPC if available
+\`\`\`
+
+## Best Practices
+
+### Data Preparation
+
+1. **Quality DTI data** - Good SNR, minimal artifacts
+2. **Proper tensor fitting** - Use robust methods (DIPY, FSL, MRtrix3)
+3. **Brain extraction** - Remove skull before registration
+4. **Check tensor quality** - No negative eigenvalues
+
+### Registration Workflow
+
+1. **Multi-stage approach** - Always rigid → affine → deformable
+2. **Use study-specific template** - Better than atlas template
+3. **Visual QC at each stage** - Don't proceed with bad registrations
+4. **Consistent parameters** - Same settings for all subjects
+5. **Document transformations** - Save all .aff and .df files
+
+### Template Construction
+
+1. **Homogeneous cohort** - Similar age, pathology for template
+2. **Sufficient iterations** - 4-6 typically adequate
+3. **Monitor convergence** - Check template stability across iterations
+4. **Final QC** - Ensure good WM alignment in template
+
+### Analysis
+
+1. **Appropriate statistics** - Account for spatial smoothness
+2. **Multiple comparison correction** - FWE or FDR mandatory
+3. **Validate findings** - ROI analysis to confirm voxel-wise results
+4. **Report methods clearly** - DTI-TK version, parameters, template
 
 ## Resources
 
-- Website: http://dti-tk.sourceforge.net/
-- User Guide: http://dti-tk.sourceforge.net/pmwiki/pmwiki.php?n=Documentation.HomePage
-- Forum: http://dti-tk.sourceforge.net/pmwiki/pmwiki.php?n=Main.Forum
-- Publications: http://dti-tk.sourceforge.net/pmwiki/pmwiki.php?n=Main.Publications
+### Official Documentation
+
+- **DTI-TK Website:** http://dti-tk.sourceforge.net/
+- **User Guide:** http://dti-tk.sourceforge.net/pmwiki/pmwiki.php?n=Documentation.HomePage
+- **Download:** http://dti-tk.sourceforge.net/pmwiki/pmwiki.php?n=Main.Download
+
+### Key Publications
+
+- **DTI-TK Method:** Zhang et al. (2006) "Deformable registration of diffusion tensor MR images with explicit orientation optimization" Medical Image Analysis
+- **Template Construction:** Zhang et al. (2007) "High-dimensional spatial normalization of diffusion tensor images improves the detection of white matter differences" Neuroimage
+
+### Learning Resources
+
+- **Tutorial:** http://dti-tk.sourceforge.net/pmwiki/pmwiki.php?n=Documentation.Tutorial
+- **Example Scripts:** Included in software distribution
+
+### Community Support
+
+- **Email:** dti-tk-users mailing list
+- **SourceForge:** http://sourceforge.net/projects/dti-tk/
 
 ## Citation
 
-```bibtex
-@article{zhang2006deformable,
-  title={Deformable registration of diffusion tensor MR images with explicit orientation optimization},
-  author={Zhang, Hui and Yushkevich, Paul A and Alexander, Daniel C and Gee, James C},
-  journal={Medical image analysis},
-  volume={10},
-  number={5},
-  pages={764--785},
-  year={2006}
+\`\`\`bibtex
+@article{Zhang2006,
+  title = {Deformable registration of diffusion tensor MR images with explicit orientation optimization},
+  author = {Zhang, Hui and Yushkevich, Paul A and Alexander, Daniel C and Gee, James C},
+  journal = {Medical Image Analysis},
+  volume = {10},
+  number = {5},
+  pages = {764--785},
+  year = {2006},
+  doi = {10.1016/j.media.2006.06.004}
 }
-
-@article{zhang2007tensor,
-  title={High-dimensional spatial normalization of diffusion tensor images improves the detection of white matter differences: an example study using amyotrophic lateral sclerosis},
-  author={Zhang, Hui and Avants, Brian B and Yushkevich, Paul A and Woo, John H and Wang, Shaowu and McCluskey, Leo F and Elman, Lauren B and Melhem, Elias R and Gee, James C},
-  journal={IEEE transactions on medical imaging},
-  volume={26},
-  number={11},
-  pages={1585--1597},
-  year={2007}
-}
-```
+\`\`\`
 
 ## Related Tools
 
-- **ANTs:** General-purpose registration (can handle tensors)
-- **FSL:** TBSS and standard registration
-- **TORTOISE:** DTI preprocessing
-- **MRtrix3:** FOD-based registration
-- **Camino:** DTI processing and analysis
-- **AFNI:** 3dDWItoDT for tensor estimation
+- **FSL TBSS** - Tract-based spatial statistics (alternative white matter analysis)
+- **ANTs** - General registration (can register DTI but doesn't reorient tensors)
+- **MRtrix3** - Comprehensive diffusion analysis suite
+- **DIPY** - Python diffusion imaging toolkit
+- **DSI Studio** - Diffusion visualization and analysis
+- **Camino** - Diffusion MRI toolkit
+- **TORTOISE** - DTI processing and quality control
+
+---
+
+**Skill Type:** Diffusion MRI Registration
+**Difficulty Level:** Intermediate to Advanced
+**Prerequisites:** Linux/macOS, DTI preprocessing experience, Understanding of diffusion tensors
+**Typical Use Cases:** DTI normalization, population template creation, voxel-based DTI analysis, white matter studies
