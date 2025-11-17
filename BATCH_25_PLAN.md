@@ -80,8 +80,8 @@ MRIQC is the gold-standard tool for automated, no-reference quality assessment o
 - Quality assurance specialists
 - Anyone sharing neuroimaging data
 
-**Estimated Lines:** 750-800
-**Estimated Code Examples:** 30-35
+**Estimated Lines:** 550-650
+**Estimated Code Examples:** 20-24
 
 **Key Topics to Cover:**
 
@@ -205,8 +205,8 @@ VisualQC is a Python tool for **manual visual quality control** of neuroimaging 
 - Anyone needing manual QC
 - Teams requiring standardized visual QC
 
-**Estimated Lines:** 700-750
-**Estimated Code Examples:** 28-32
+**Estimated Lines:** 550-650
+**Estimated Code Examples:** 20-24
 
 **Key Topics to Cover:**
 
@@ -258,13 +258,19 @@ VisualQC is a Python tool for **manual visual quality control** of neuroimaging 
    - Export ratings
    - Generate QC summary reports
 
-9. **Collaboration and Standards**
+9. **Reliability Protocols**
+   - Rater calibration sessions with shared exemplars
+   - Scoring rubrics and anchor images
+   - Inter-rater agreement checkpoints (e.g., Cohen's kappa)
+   - Consensus resolution workflows
+
+10. **Collaboration and Standards**
    - Multi-rater reliability
    - Training new raters
    - Quality control protocols
    - Inter-rater agreement
 
-10. **Integration**
+11. **Integration**
     - Combine with MRIQC metrics
     - FreeSurfer workflow integration
     - Export to analysis pipelines
@@ -320,8 +326,8 @@ fMRIPrep generates comprehensive visual quality control reports as part of its p
 - Preprocessing pipeline users
 - Multi-site study teams
 
-**Estimated Lines:** 700-750
-**Estimated Code Examples:** 28-32
+**Estimated Lines:** 550-650
+**Estimated Code Examples:** 20-24
 
 **Key Topics to Cover:**
 
@@ -419,6 +425,10 @@ fMRIPrep generates comprehensive visual quality control reports as part of its p
 **Overview:**
 This skill covers **custom quality control automation** using Python, shell scripting, and integration tools. It teaches users how to build their own QC pipelines, automate quality metric extraction, create custom visualizations, develop QC dashboards, and integrate multiple QC tools into cohesive workflows. This is particularly valuable for groups with specific QC needs, large-scale studies, or unique data types not fully covered by existing tools.
 
+**Prioritized Deliverables:**
+- **Minimum viable path:** Metric aggregation from MRIQC/fMRIPrep, basic dashboard (static or lightweight Dash), and alerting on threshold breaches.
+- **Stretch items:** Database backends, real-time monitoring, multi-user interfaces, and advanced machine learning outlier detectors.
+
 **Key Capabilities:**
 - Custom QC metric calculation
 - Automated quality dashboards
@@ -444,8 +454,8 @@ This skill covers **custom quality control automation** using Python, shell scri
 - Pipeline developers
 - Groups with custom QC needs
 
-**Estimated Lines:** 650-700
-**Estimated Code Examples:** 26-30
+**Estimated Lines:** 550-650
+**Estimated Code Examples:** 20-24
 
 **Key Topics to Cover:**
 
@@ -537,8 +547,8 @@ This skill covers **custom quality control automation** using Python, shell scri
    - **QC Automation** - Custom workflows and integration (new)
 
 2. **Comprehensive Coverage:**
-   - Each skill: 650-800 lines
-   - 26-35 code examples per skill
+   - Each skill: 550-650 lines
+   - 20-24 code examples per skill
    - Real-world QC workflows
    - Integration across tools
 
@@ -610,12 +620,12 @@ All skills will demonstrate integration with:
 
 ### Quality Targets
 
-- **Minimum lines per skill:** 650
-- **Target lines per skill:** 700-800
-- **Minimum code examples:** 26
-- **Target code examples:** 28-35
-- **Total batch lines:** ~2,800-3,100
-- **Total code examples:** ~112-132
+- **Minimum lines per skill:** 550
+- **Target lines per skill:** 550-650
+- **Minimum code examples:** 20
+- **Target code examples:** 20-24
+- **Total batch lines:** ~2,200-2,600
+- **Total code examples:** ~80-96
 
 ---
 
@@ -625,11 +635,11 @@ All skills will demonstrate integration with:
 
 | Tool | Est. Lines | Est. Examples | Priority | Status |
 |------|-----------|---------------|----------|---------|
-| MRIQC | 750-800 | 30-35 | High | Create new |
-| VisualQC | 700-750 | 28-32 | High | Create new |
-| fMRIPrep QC | 700-750 | 28-32 | High | Create new |
-| QC Automation | 650-700 | 26-30 | Medium-High | Create new |
-| **TOTAL** | **2,800-3,000** | **112-129** | - | - |
+| MRIQC | 550-650 | 20-24 | High | Create new |
+| VisualQC | 550-650 | 20-24 | High | Create new |
+| fMRIPrep QC | 550-650 | 20-24 | High | Create new |
+| QC Automation | 550-650 | 20-24 | Medium-High | Create new |
+| **TOTAL** | **2,200-2,600** | **80-96** | - | - |
 
 ### Coverage Analysis
 
@@ -864,9 +874,9 @@ Each skill will include:
    - Cross-validation of metrics
 
 4. **Example Data:**
-   - Links to public test datasets
-   - Expected QC outputs
-   - Quality metric ranges
+   - OpenNeuro sample datasets (e.g., ds000114 for fMRIPrep QC, ds003097 for MRIQC)
+   - VisualQC demo sets with FreeSurfer derivatives (e.g., Mindboggle or OASIS subsets)
+   - Expected QC outputs and metric ranges
    - Interpretation guidelines
 
 ---
@@ -885,12 +895,54 @@ Each skill will include:
 
 ---
 
+## Skill Processing Workflow (Execution Plan)
+
+**Objective:** translate the scoped plan into concrete production steps so each skill can be authored, validated, and delivered consistently within the 4.5–5 hour window.
+
+### Batch-Level Steps
+1. **Prep shared assets (30 min):**
+   - Download/verify OpenNeuro ds000114 (fMRIPrep QC), ds003097 (MRIQC), and VisualQC-friendly FreeSurfer derivatives (e.g., Mindboggle/OASIS subset) to reuse across skills.
+   - Stage a lightweight BIDS sample with minimal participants/runs for fast iterative testing.
+2. **Template setup (15 min):**
+   - Duplicate the latest QC-focused skill template (sections, code block scaffolds, troubleshooting, citations) to maintain consistency.
+   - Pre-fill cross-references to MRIQC, VisualQC, and fMRIPrep to speed linking.
+3. **Execution cadence:** work skill-by-skill with a hard stop at 70 minutes; defer stretch items to follow-up passes.
+4. **Validation checkpoint:** after each skill, run at least one end-to-end command on the staged dataset and capture expected outputs/screenshots for citations.
+5. **Batch wrap-up:** update progress counters (93/133) and ensure cross-links between all four skills are live.
+
+### Skill-by-Skill Processing
+- **MRIQC (75–90 min):**
+  - Author installation (Docker/Singularity) and BIDS run examples; include IQM CSV excerpts from ds003097.
+  - Generate one HTML report screenshot and summarize key metrics (SNR, FD) for interpretation.
+  - Document group-level aggregation and classifier outputs; flag stretch topics (multi-site harmonization) if time-bound.
+
+- **VisualQC (65–75 min):**
+  - Build walkthrough for T1w + FreeSurfer QC using staged derivatives; capture rating workflow with keyboard shortcuts.
+  - Add rater calibration flow (shared exemplars, rubric) and inter-rater agreement checkpoint (Cohen’s kappa snippet).
+  - Export ratings example and reconciliation steps for discordant cases.
+
+- **fMRIPrep QC Focus (65–75 min):**
+  - Map report sections to quick-look checks (skull strip, BOLD→T1w, carpet plots) using ds000114 outputs.
+  - Provide confounds.tsv parsing snippets for FD/DVARS thresholds and flagging rules.
+  - Include group summary table generation and recommended exclusion criteria.
+
+- **QC Automation (60–70 min):**
+  - Implement minimum viable path: ingest MRIQC IQMs + fMRIPrep confounds, compute flags, emit CSV/JSON summary, and render a simple dashboard (e.g., Plotly/Altair) with alert thresholds.
+  - Note stretch goals (database backend, live monitoring) but time-box to basic aggregation + notifications.
+  - Provide reusable scripts for reruns and cron-style scheduling.
+
+### Review & Sign-off
+- Self-QA: confirm each skill meets success criteria (install, workflows, metrics, troubleshooting, references) and cites test outputs.
+- Peer-QA: quick pass for consistency of terminology, thresholds, and dataset identifiers across all four skills.
+
+---
+
 ## Success Criteria
 
 Batch 25 will be considered successful when:
 
-✓ All 4 skills created with 650-800 lines each
-✓ Total of 112+ code examples across batch
+✓ All 4 skills created with 550-650 lines each
+✓ Total of 80-96 code examples across batch
 ✓ Each skill includes:
   - Comprehensive installation instructions
   - Basic to advanced QC workflows
@@ -964,4 +1016,4 @@ By providing access to state-of-the-art quality control tools and workflows, Bat
 **Document Version:** 1.0
 **Created:** 2025-11-17
 **Batch Status:** Planning Complete, Ready for Implementation
-**Estimated Completion:** 4 skills, ~2,800-3,000 lines, ~112-129 examples
+**Estimated Completion:** 4 skills, ~2,200-2,600 lines, ~80-96 examples
