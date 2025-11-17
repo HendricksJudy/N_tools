@@ -1,8 +1,8 @@
-# Batch 26: Advanced Diffusion & DMRI - Planning Document
+# Batch 26: Computational Neuroscience & Brain Simulation - Planning Document
 
 ## Overview
 
-**Batch Theme:** Advanced Diffusion & DMRI
+**Batch Theme:** Computational Neuroscience & Brain Simulation
 **Batch Number:** 26
 **Number of Skills:** 2
 **Current Progress:** 93/133 skills completed (69.9%)
@@ -10,187 +10,215 @@
 
 ## Rationale
 
-Batch 26 focuses on **advanced diffusion MRI processing and tractography pipelines** to deliver robust end-to-end diffusion workflows. These tools provide:
+Batch 26 focuses on **computational neuroscience and whole-brain simulation tools** that bridge neuroimaging data with biophysical models and advanced machine learning. These tools provide:
 
-- **Integrated pipelines** that automate preprocessing, modeling, and tractography
-- **Clinically relevant visualization** for neurosurgical planning and research
-- **Reproducible containerized workflows** that scale from desktops to clusters
-- **Quality control and reporting** to assess diffusion data fidelity
-- **Interoperability with BIDS and 3D Slicer ecosystems**
+- **Whole-brain network modeling** and simulation
+- **Biophysically realistic brain dynamics**
+- **Advanced machine learning** for neuroimaging analysis
+- **Functional connectivity modeling** and validation
+- **Multi-scale brain simulation** from neurons to networks
+- **Data-driven brain modeling** using empirical neuroimaging
 
 **Key Scientific Advances:**
-- Streamlined diffusion workflows reduce manual errors and variability
-- Advanced modeling and tracking improve white matter characterization
-- Interactive 3D visualization accelerates quality review and clinical communication
-- Containerization ensures reproducibility across sites
+- Link structural connectivity to functional dynamics
+- Predict brain activity patterns from network models
+- Advanced statistical learning for neuroimaging
+- Validate computational models against empirical data
+- Multi-modal integration of imaging and simulation
 
 **Applications:**
-- Clinical neurosurgical planning and connectomics
-- Research studies requiring standardized tractography
-- Large-scale diffusion processing on HPC or cloud systems
-- Teaching and demonstrations using 3D Slicer
+- Computational psychiatry and disease modeling
+- Predicting brain dynamics from structural connectivity
+- Advanced machine learning on neuroimaging data
+- Virtual brain surgery planning and outcome prediction
+- Multi-scale brain modeling and simulation
+- Research integrating data analysis with computational models
 
 ---
 
 ## Tools in This Batch
 
-### 1. SlicerDMRI (Diffusion MRI Extension for 3D Slicer)
-**Website:** https://dmri.slicer.org/
-**GitHub:** https://github.com/SlicerDMRI/SlicerDMRI
-**Platform:** 3D Slicer extension (Windows/macOS/Linux)
-**Priority:** Medium
+### 1. The Virtual Brain (TVB)
+**Website:** https://www.thevirtualbrain.org/
+**GitHub:** https://github.com/the-virtual-brain/tvb-root
+**Platform:** Python (Windows/macOS/Linux)
+**Priority:** High
 **Current Status:** Does Not Exist - Need to Create
 
 **Overview:**
-SlicerDMRI is the official diffusion MRI toolkit for 3D Slicer. It delivers interactive visualization, preprocessing, tractography, and quantitative analysis within a clinical-grade 3D environment. The extension supports diffusion tensor imaging (DTI), diffusion spectrum imaging (DSI), and higher-order models, enabling neurosurgical planning and research-grade tract analysis.
+The Virtual Brain (TVB) is an open-source neuroinformatics platform for simulating large-scale brain network dynamics using empirically-derived structural connectivity. TVB enables researchers to build personalized brain models from subject-specific neuroimaging data (structural/diffusion MRI, fMRI, MEG/EEG), simulate brain dynamics using biophysical models, and validate predictions against empirical recordings.
 
 **Key Capabilities:**
-- DWI preprocessing (eddy correction, bias field correction, gradient table handling)
-- Tensor and higher-order model fitting (DTI, HARDI, multi-shell)
-- Deterministic and probabilistic tractography
-- Interactive 3D visualization and tract editing
-- Region-of-interest seeding and labelmap-based selection
-- Quantitative tract metrics (FA, MD, RD, AD) and tract profiles
-- Tract clustering and cleaning utilities
-- Integration with 3D Slicer segmentation and registration modules
-- Export to common formats (VTK, NIfTI, MRML)
+- Whole-brain network simulation with biophysical models
+- Integration of structural connectivity (DTI/tractography) into simulations
+- Multiple neural mass models (Wilson-Cowan, Kuramoto, FitzHugh-Nagumo, etc.)
+- Forward modeling for fMRI, MEG, EEG signals
+- Parameter exploration and optimization
+- Personalized brain models from individual connectivity
+- Interactive GUI and Python scripting API
+- Multi-scale modeling from regions to neurons
+- Disease modeling (epilepsy, stroke, tumors, neurodegenerative)
+- Virtual lesion studies and surgical planning
 
 **Target Audience:**
-- Clinical and research users needing interactive diffusion visualization
-- Neurosurgeons and neuroradiologists for preoperative planning
-- Researchers performing tract-based analyses within 3D Slicer
+- Computational neuroscientists modeling brain dynamics
+- Clinical researchers studying disease mechanisms
+- Theoreticians linking structure to function
+- Researchers validating network models against data
 
-**Estimated Lines:** 600-650
-**Estimated Code Examples:** 18-22
+**Estimated Lines:** 650-700
+**Estimated Code Examples:** 20-24
 
 **Key Topics to Cover:**
 1. **Installation and Setup**
-   - Install 3D Slicer
-   - Add SlicerDMRI extension via Extension Manager
-   - Verify diffusion toolbars and modules
+   - Install TVB (pip, Docker, source)
+   - Launch TVB GUI and web interface
+   - Python API setup and environment
 
-2. **Data Preparation**
-   - Import DWI, b-values, and b-vectors
-   - Gradient table checks and reorientation
-   - DWI denoising and bias correction
+2. **Building Connectivity Models**
+   - Import structural connectivity matrices
+   - Load default and custom atlases
+   - Integrate DTI tractography data
+   - Define region parcellations
 
-3. **Model Fitting**
-   - Tensor fitting (FA, MD, eigenvectors)
-   - HARDI and multi-shell reconstruction options
-   - Handling multi-b-value datasets
+3. **Neural Mass Models**
+   - Wilson-Cowan oscillators
+   - Generic 2D oscillator
+   - Kuramoto model
+   - Epileptor and seizure modeling
+   - Custom model development
 
-4. **Tractography**
-   - Deterministic and probabilistic seeding
-   - ROI-based seeding and exclusion
-   - Tract editing, pruning, and cleaning
+4. **Simulation Configuration**
+   - Set integration parameters
+   - Configure monitors (BOLD, EEG, MEG)
+   - Noise and stochasticity
+   - Coupling functions
 
-5. **Visualization**
-   - 3D tract rendering and slice overlays
-   - Color-by-orientation and scalar overlays
-   - Interactive tract selection and labeling
+5. **Running Simulations**
+   - Launch whole-brain simulations
+   - Parameter sweeps and exploration
+   - GPU acceleration
+   - Batch simulation management
 
-6. **Quantification & Export**
-   - Tract profiles and region statistics
-   - Export tracts and scalar volumes to NIfTI/VTK
-   - Screenshots and 3D scenes for reporting
+6. **Analysis and Visualization**
+   - Time series analysis
+   - Functional connectivity from simulations
+   - 3D brain visualization
+   - Compare simulated vs empirical data
 
-7. **Integration & Workflows**
-   - Registration with structural MRI
-   - Using Slicer modules for segmentation/labeling
-   - Pipeline templates for clinical review
+7. **Personalized Brain Models**
+   - Subject-specific connectivity
+   - Patient-specific disease models
+   - Virtual lesions and surgery
+   - Outcome prediction
 
-8. **Quality Control & Troubleshooting**
-   - Motion/artifact detection
-   - Gradient inconsistencies
-   - Common tractography pitfalls and parameter tuning
+8. **Integration & Advanced Use**
+   - Link to neuroimaging pipelines
+   - Export results for further analysis
+   - Multi-modal data integration
+   - Troubleshooting and optimization
 
 **Example Workflows:**
-- Pre-surgical corticospinal tract planning
-- Tract-based FA/MD analysis for research cohorts
-- Interactive QC of diffusion acquisitions and tracts
+- Simulate resting-state fMRI from structural connectivity
+- Model epileptic seizure propagation in patient brain
+- Virtual lesion studies for surgical planning
+- Parameter optimization to fit empirical MEG data
 
 ---
 
-### 2. TractoFlow (Reproducible Tractography Pipeline)
-**Website:** https://tractoflow-documentation.readthedocs.io/
-**GitHub:** https://github.com/scilus/tractoflow
-**Platform:** Nextflow + Singularity/Docker
-**Priority:** Medium
+### 2. BrainIAK (Brain Imaging Analysis Kit)
+**Website:** https://brainiak.org/
+**GitHub:** https://github.com/brainiak/brainiak
+**Platform:** Python (Linux/macOS)
+**Priority:** High
 **Current Status:** Does Not Exist - Need to Create
 
 **Overview:**
-TractoFlow is a fully automated and reproducible diffusion MRI processing pipeline built with Nextflow. It integrates best-practice steps—denoising, Gibbs ringing removal, bias correction, motion/eddy correction, susceptibility correction, model fitting, tractography, and bundle segmentation—using Singularity/Docker containers for consistent results across HPC and cloud environments.
+BrainIAK (Brain Imaging Analysis Kit) is a Python package for advanced fMRI analysis developed by Intel and Princeton Neuroscience Institute. It provides high-performance implementations of state-of-the-art algorithms for multivariate pattern analysis, real-time fMRI, functional connectivity, and machine learning on neuroimaging data. BrainIAK emphasizes computational efficiency with MPI parallelization and is optimized for HPC environments.
 
 **Key Capabilities:**
-- BIDS-friendly inputs and organized outputs
-- Automated preprocessing (denoising, Gibbs, bias, motion/eddy, susceptibility)
-- Multi-shell support for advanced modeling
-- FOD estimation and anatomically constrained tractography
-- Whole-brain tractography with filtering (SIFT/SIFT2-style)
-- Bundle segmentation and recognition
-- Quality control reports and logs
-- HPC- and cloud-ready execution via Nextflow
-- Reproducible containerized environment (Singularity/Docker)
+- Searchlight analysis with MPI parallelization
+- Full correlation matrix analysis (FCMA)
+- Shared response modeling (SRM) for hyperalignment
+- Real-time fMRI analysis and neurofeedback
+- Inter-subject correlation (ISC) and inter-subject functional connectivity (ISFC)
+- Representational similarity analysis (RSA)
+- Event segmentation and time-series analysis
+- Template-based rotation for small sample sizes
+- Multi-voxel pattern analysis (MVPA)
+- HPC-optimized with MPI and Cython
 
 **Target Audience:**
-- Researchers needing standardized, reproducible diffusion pipelines
-- Labs running large diffusion cohorts on HPC or cloud
-- Users migrating from ad-hoc scripts to containerized workflows
+- Researchers performing multivariate fMRI analysis
+- Cognitive neuroscientists using MVPA methods
+- Real-time fMRI and neurofeedback studies
+- Large-scale neuroimaging studies with HPC resources
+- Method developers needing efficient implementations
 
-**Estimated Lines:** 600-650
-**Estimated Code Examples:** 18-22
+**Estimated Lines:** 650-700
+**Estimated Code Examples:** 20-24
 
 **Key Topics to Cover:**
 1. **Installation and Setup**
-   - Install Nextflow
-   - Configure Singularity or Docker
-   - Download TractoFlow pipelines and test datasets
+   - Install BrainIAK via pip/conda
+   - MPI setup for parallelization
+   - HPC environment configuration
+   - Dependencies (NumPy, SciPy, scikit-learn, NiBabel)
 
-2. **Input Preparation**
-   - Expected directory structure (BIDS or custom)
-   - DWI, bval, bvec validation
-   - Optional fieldmaps for susceptibility correction
+2. **Searchlight Analysis**
+   - Whole-brain searchlight MVPA
+   - MPI parallelization for speed
+   - Custom searchlight functions
+   - Statistical inference
 
-3. **Running the Pipeline**
-   - Basic Nextflow command with minimal parameters
-   - Specifying container engine and resource requests
-   - Multi-subject batch runs on HPC/cloud
+3. **Shared Response Modeling (SRM)**
+   - Functional alignment across subjects
+   - Hyperalignment for inter-subject analysis
+   - Dimensionality reduction
+   - Template construction
 
-4. **Processing Stages**
-   - Denoising, Gibbs removal, bias correction
-   - Motion and eddy current correction
-   - Susceptibility correction (topup/fieldmaps)
-   - Model fitting (DTI, FOD)
-   - Tractography generation and filtering
+4. **Inter-Subject Correlation (ISC)**
+   - ISC for naturalistic stimuli
+   - Inter-subject functional connectivity (ISFC)
+   - Statistical testing
+   - Time-segment analysis
 
-5. **Outputs & QC**
-   - Directory layout and key derivatives
-   - QC reports/logs and what to inspect
-   - Exporting tracts and metrics for downstream analysis
+5. **Real-Time fMRI**
+   - Real-time preprocessing
+   - Incremental GLM
+   - Neurofeedback implementation
+   - Online pattern classification
 
-6. **Advanced Configuration**
-   - Custom resource settings and parallelization
-   - Selecting models and tracking parameters
-   - Resuming pipelines and caching
+6. **Event Segmentation**
+   - Hidden Markov models for events
+   - Boundary detection in time series
+   - Cross-subject event alignment
+   - Hierarchical event models
 
-7. **Integration & Scaling**
-   - Coupling with fMRIPrep or anatomical pipelines
-   - Cloud execution patterns
-   - Data management tips for large cohorts
+7. **Representational Similarity Analysis (RSA)**
+   - Compute representational dissimilarity matrices
+   - Compare neural representations
+   - Model-based RSA
+   - Searchlight RSA
 
-8. **Troubleshooting**
-   - Container/runtime issues
-   - Common diffusion failures (bvec errors, motion)
-   - Performance tuning
+8. **Integration & Workflows**
+   - Preprocessing with fMRIPrep
+   - HPC job submission
+   - Batch processing multiple subjects
+   - Visualization and reporting
 
 **Example Workflows:**
-- End-to-end reproducible processing of a 50-subject multi-shell study
-- HPC batch execution with Singularity and SLURM
-- Tractography outputs for connectome construction or bundle analysis
+- Whole-brain searchlight decoding with MPI
+- Shared response model for movie-watching fMRI
+- Real-time neurofeedback experiment
+- Inter-subject correlation during naturalistic viewing
 
 ---
 
 ## Success Criteria
-- Two new skills authored with coverage of installation, core workflows, QC, and troubleshooting.
-- Each skill includes ~600-650 lines with ~18-22 examples, emphasizing reproducibility and QC.
-- Clear guidance on HPC/cloud execution for TractoFlow and interactive 3D workflows for SlicerDMRI.
+- Two new skills authored with comprehensive coverage of installation, core methods, workflows, and troubleshooting
+- Each skill includes ~650-700 lines with ~20-24 code examples
+- TVB skill emphasizes whole-brain simulation, biophysical models, and personalized brain modeling
+- BrainIAK skill emphasizes advanced MVPA methods, HPC optimization, and real-time fMRI
+- Clear integration examples with neuroimaging pipelines (fMRIPrep, tractography)
+- Practical workflows demonstrating computational modeling and advanced machine learning
