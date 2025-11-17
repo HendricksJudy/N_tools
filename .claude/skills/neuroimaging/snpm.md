@@ -551,6 +551,227 @@ When helping users with SnPM:
 **Problem:** Results differ from SPM parametric tests
 **Solution:** Expected - SnPM more conservative for small n, parametric more liberal when assumptions hold
 
+## Comparison with Parametric SPM
+
+### Run Both Methods for Comparison
+
+```matlab
+% First run parametric SPM analysis
+% SPM → Specify 2nd-level → Design
+% SPM → Estimate
+% SPM → Results
+
+% Then run equivalent SnPM analysis
+snpm
+% Configure with same design, contrasts, images
+
+% Compare results
+% Load SPM results
+spm_results = spm_read_vols(spm_vol('spmT_0001.nii'));
+
+% Load SnPM results
+snpm_results = spm_read_vols(spm_vol('SnPMt_filtered.nii'));
+
+% Compute overlap
+spm_thresh = spm_results > 3.0;
+snpm_thresh = snpm_results > 3.0;
+
+overlap = spm_thresh & snpm_thresh;
+only_spm = spm_thresh & ~snpm_thresh;
+only_snpm = snpm_thresh & ~spm_thresh;
+
+fprintf('Voxels significant in both: %d\n', sum(overlap(:)));
+fprintf('Only parametric SPM: %d\n', sum(only_spm(:)));
+fprintf('Only nonparametric SnPM: %d\n', sum(only_snpm(:)));
+```
+
+### When Results Differ
+
+```matlab
+% SnPM typically more conservative with small n
+% Check normality of data
+n_subjects = 15;
+subject_means = zeros(n_subjects, 1);
+
+for s = 1:n_subjects
+    img = spm_read_vols(spm_vol(scans{s}));
+    subject_means(s) = mean(img(mask > 0));
+end
+
+% Test normality
+[h, p] = lillietest(subject_means);
+if h == 1
+    fprintf('Data may not be normal (p = %.4f)\n', p);
+    fprintf('SnPM results more reliable\n');
+else
+    fprintf('Data appears normal (p = %.4f)\n', p);
+    fprintf('SPM and SnPM should agree\n');
+end
+```
+
+## Advanced Batch Scripting
+
+### Complete Automated Pipeline
+
+```matlab
+% SnPM batch script for two-sample t-test
+clear matlabbatch;
+
+% Configuration
+group1_scans = cellstr(spm_select('FPList', '/data/controls/', '^con.*\.nii$'));
+group2_scans = cellstr(spm_select('FPList', '/data/patients/', '^con.*\.nii$'));
+output_dir = '/results/snpm_ttest/';
+n_perm = 5000;
+
+% Initialize batch
+matlabbatch{1}.spm.tools.snpm.des.TwoSampT.DesignName = 'MultiSub: Two Sample T test; 1 scan per subject';
+matlabbatch{1}.spm.tools.snpm.des.TwoSampT.DesignFile = 'snpm_bch_ui_TwoSampT';
+matlabbatch{1}.spm.tools.snpm.des.TwoSampT.dir = {output_dir};
+
+% Group 1 scans
+matlabbatch{1}.spm.tools.snpm.des.TwoSampT.scans1 = group1_scans;
+
+% Group 2 scans
+matlabbatch{1}.spm.tools.snpm.des.TwoSampT.scans2 = group2_scans;
+
+% Variance smoothing
+matlabbatch{1}.spm.tools.snpm.des.TwoSampT.vFWHM = [6 6 6];
+
+% Compute
+matlabbatch{2}.spm.tools.snpm.cp.snpmcfg = {fullfile(output_dir, 'SnPMcfg.mat')};
+
+% Inference
+matlabbatch{3}.spm.tools.snpm.inference.SnPMmat = {fullfile(output_dir, 'SnPM.mat')};
+matlabbatch{3}.spm.tools.snpm.inference.Thr.Vox.VoxSig.Pth = 0.05;
+matlabbatch{3}.spm.tools.snpm.inference.Tsign = 1;  % Positive effects
+matlabbatch{3}.spm.tools.snpm.inference.WriteFiltImg.name = 'SnPMt_filtered.nii';
+matlabbatch{3}.spm.tools.snpm.inference.Report = 'MIPtable';
+
+% Run batch
+spm_jobman('run', matlabbatch);
+```
+
+### Loop Over Multiple Contrasts
+
+```matlab
+% Batch process multiple contrast images
+contrasts = {'con_0001', 'con_0002', 'con_0003'};
+contrast_names = {'Faces > Baseline', 'Houses > Baseline', 'Faces > Houses'};
+
+for c = 1:length(contrasts)
+    fprintf('Processing contrast: %s\n', contrast_names{c});
+
+    % Setup directories
+    output_dir = sprintf('/results/snpm_%s/', contrasts{c});
+    if ~exist(output_dir, 'dir')
+        mkdir(output_dir);
+    end
+
+    % Get scan files
+    group1_files = cellstr(spm_select('FPList', '/data/controls/', sprintf('^%s.*\\.nii$', contrasts{c})));
+    group2_files = cellstr(spm_select('FPList', '/data/patients/', sprintf('^%s.*\\.nii$', contrasts{c})));
+
+    % Run SnPM (reuse batch structure from above)
+    clear matlabbatch;
+    % ... configure batch ...
+    spm_jobman('run', matlabbatch);
+
+    fprintf('Completed: %s\n\n', contrast_names{c});
+end
+```
+
+## Multi-Level Factorial Designs
+
+### 2×2 Factorial ANOVA
+
+```matlab
+% Two factors: Group (Control, Patient) × Condition (Task A, Task B)
+% Question: Is there a Group × Condition interaction?
+
+snpm
+% In GUI:
+% Select: "MultiSub: Two-way ANOVA, 1 scan per subject"
+
+% Specify factor levels
+% Factor 1 (Group): 2 levels
+% Factor 2 (Condition): 2 levels
+
+% Load scans in order:
+% Control-TaskA, Control-TaskB, Patient-TaskA, Patient-TaskB
+
+% Or via script:
+n_per_group = 20;
+
+scans = [
+    cellstr(spm_select('FPList', '/data/controls/taskA/', '^con.*\.nii$'));
+    cellstr(spm_select('FPList', '/data/controls/taskB/', '^con.*\.nii$'));
+    cellstr(spm_select('FPList', '/data/patients/taskA/', '^con.*\.nii$'));
+    cellstr(spm_select('FPList', '/data/patients/taskB/', '^con.*\.nii$'))
+];
+
+% Specify cell sizes
+cell_sizes = [n_per_group, n_per_group, n_per_group, n_per_group];
+
+% Main effect of Group: [1 1 -1 -1]
+% Main effect of Condition: [1 -1 1 -1]
+% Interaction: [1 -1 -1 1]
+```
+
+## Integration with CAT12
+
+### VBM Analysis with CAT12 + SnPM
+
+```matlab
+% After CAT12 preprocessing (segmentation, normalization, smoothing)
+
+% 1. Locate smoothed grey matter images
+cat12_dir = '/data/cat12_output/';
+gm_pattern = 'smwp1*.nii';  % Smoothed, modulated, warped GM
+
+% Get files
+controls = cellstr(spm_select('FPList', fullfile(cat12_dir, 'controls/mri'), gm_pattern));
+patients = cellstr(spm_select('FPList', fullfile(cat12_dir, 'patients/mri'), gm_pattern));
+
+% 2. Create explicit mask (absolute threshold)
+% Use CAT12 TPM or create from data
+mask_file = fullfile(cat12_dir, 'mask_GM_0.2.nii');
+
+% 3. Run SnPM two-sample t-test
+snpm
+% Select: Two Sample T-test
+% Group 1: controls
+% Group 2: patients
+% Variance smoothing: 6mm (or match to CAT12 smoothing)
+% Explicit mask: mask_file
+
+% 4. Check for regional effects
+% Significant clusters likely in regions with GM differences
+% (e.g., hippocampus in AD, cortical thinning in schizophrenia)
+```
+
+### Quality Control Before SnPM
+
+```matlab
+% Check CAT12 quality measures before group analysis
+subjects = dir(fullfile(cat12_dir, 'sub-*'));
+
+qc_data = [];
+for s = 1:length(subjects)
+    xml_file = fullfile(subjects(s).folder, subjects(s).name, 'report', 'cat_*.xml');
+    xml = dir(xml_file);
+
+    if ~isempty(xml)
+        % Read quality metrics from XML
+        % This is simplified - actual parsing needed
+        % overall_quality typically in 'NCR' (Noise-Contrast Ratio)
+        fprintf('Subject %s: Check QC\n', subjects(s).name);
+    end
+end
+
+% Exclude subjects with poor quality before SnPM
+% Threshold: e.g., only include if quality grade A or B
+```
+
 ## Best Practices
 
 1. **Sample Size:**

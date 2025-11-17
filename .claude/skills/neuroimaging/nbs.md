@@ -547,6 +547,297 @@ When helping users with NBS:
    - Self-connections: Set diagonal to zero
    - Missing data: Impute or exclude subjects
 
+## Effect Size and Power Analysis
+
+### Computing Effect Sizes
+
+```matlab
+% Calculate effect sizes for significant components
+if nbs_result.n > 0
+    comp1_edges = nbs_result.con_mat{1};
+    [row, col] = find(comp1_edges);
+
+    % Extract connectivity values for edges in component
+    group1_comp_edges = zeros(length(row), size(connectivity_group1, 4));
+    group2_comp_edges = zeros(length(row), size(connectivity_group2, 4));
+
+    for e = 1:length(row)
+        group1_comp_edges(e, :) = squeeze(connectivity_group1(row(e), col(e), 1, :));
+        group2_comp_edges(e, :) = squeeze(connectivity_group2(row(e), col(e), 1, :));
+    end
+
+    % Mean connectivity across component edges
+    mean_comp_group1 = mean(group1_comp_edges, 1);
+    mean_comp_group2 = mean(group2_comp_edges, 1);
+
+    % Cohen's d for component
+    pooled_std = sqrt((std(mean_comp_group1)^2 + std(mean_comp_group2)^2) / 2);
+    cohens_d = (mean(mean_comp_group1) - mean(mean_comp_group2)) / pooled_std;
+
+    fprintf('Component 1 effect size (Cohen''s d): %.3f\n', cohens_d);
+end
+```
+
+### Sample Size Estimation
+
+```matlab
+% Estimate required sample size for desired power
+alpha = 0.05;
+power = 0.80;
+expected_effect_size = 0.5;  % Cohen's d
+
+% Use power analysis (requires Statistics Toolbox)
+n_required = sampsizepwr('t', [0, 1], expected_effect_size, power, [], 'Alpha', alpha);
+
+fprintf('Required sample size per group: %.0f\n', ceil(n_required));
+fprintf('Total sample size needed: %.0f\n', ceil(n_required * 2));
+```
+
+## Multi-Site Studies
+
+### Site as Covariate
+
+```matlab
+% Multi-site data with site as covariate
+% Site coding: Site1=1, Site2=2, Site3=3
+site = [ones(10,1); 2*ones(10,1); 3*ones(10,1); ...
+        ones(10,1); 2*ones(10,1); 3*ones(10,1)];
+
+% Group coding
+group = [ones(30,1); zeros(30,1)];
+
+% Create design with site dummies
+site_dummy1 = double(site == 1);
+site_dummy2 = double(site == 2);
+% Site 3 is reference
+
+nbs.design = [group, site_dummy1, site_dummy2];
+
+% Contrast for group effect (controlling for site)
+nbs.contrast = [1, -1, 0, 0];
+
+% Run NBS
+[nbs_result] = NBSrun(nbs);
+```
+
+### ComBat Harmonization
+
+```matlab
+% Apply ComBat harmonization before NBS
+% Requires ComBat MATLAB implementation
+
+% Reshape connectivity matrices for ComBat
+n_subjects = size(all_connectivity, 4);
+n_edges = n_nodes * (n_nodes - 1) / 2;
+
+% Extract upper triangle
+conn_vectorized = zeros(n_subjects, n_edges);
+for s = 1:n_subjects
+    mat = all_connectivity(:, :, 1, s);
+    conn_vectorized(s, :) = mat(triu(true(n_nodes), 1));
+end
+
+% Apply ComBat
+% batch = site labels
+% mod = covariates to preserve (e.g., group, age)
+conn_harmonized = combat(conn_vectorized', batch, mod)';
+
+% Reshape back to matrices
+all_connectivity_harmonized = zeros(n_nodes, n_nodes, 1, n_subjects);
+for s = 1:n_subjects
+    mat = zeros(n_nodes, n_nodes);
+    mat(triu(true(n_nodes), 1)) = conn_harmonized(s, :);
+    mat = mat + mat';
+    all_connectivity_harmonized(:, :, 1, s) = mat;
+end
+
+% Proceed with NBS on harmonized data
+```
+
+## Python Implementation (NBS-Predict)
+
+### Installation
+
+```bash
+# Install NBS-Predict (Python implementation)
+pip install nbs-predict
+
+# Or from source
+git clone https://github.com/ColeLab/NetworkBasedStatistic.git
+cd NetworkBasedStatistic
+pip install -e .
+```
+
+### Basic Python Usage
+
+```python
+import numpy as np
+from nbs import nbs_bct
+
+# Load connectivity matrices
+# Shape: (n_subjects, n_nodes, n_nodes)
+group1_conn = np.load('group1_connectivity.npy')
+group2_conn = np.load('group2_connectivity.npy')
+
+# Combine groups
+all_conn = np.concatenate([group1_conn, group2_conn], axis=0)
+
+# Create group labels
+n1 = group1_conn.shape[0]
+n2 = group2_conn.shape[0]
+group_labels = np.array([1]*n1 + [2]*n2)
+
+# Run NBS
+thresh = 3.0
+k = 5000  # Number of permutations
+
+# Two-sample t-test
+pval, adj, null = nbs_bct(all_conn, group_labels, thresh, k, tail='both')
+
+# Extract significant components
+if adj is not None:
+    n_components = len(np.unique(adj)) - 1  # Exclude 0
+    print(f'Significant components: {n_components}')
+
+    for comp in range(1, n_components + 1):
+        comp_size = np.sum(adj == comp)
+        print(f'Component {comp}: {comp_size} edges, p = {pval[comp-1]:.4f}')
+```
+
+### Python with Covariates
+
+```python
+import pandas as pd
+from sklearn.linear_model import LinearRegression
+
+# Load subject data
+subjects_df = pd.read_csv('subjects.csv')
+age = subjects_df['age'].values
+sex = subjects_df['sex'].values  # 0=F, 1=M
+
+# Regress out covariates from each edge
+n_subjects = all_conn.shape[0]
+n_nodes = all_conn.shape[1]
+
+conn_corrected = np.zeros_like(all_conn)
+
+for i in range(n_nodes):
+    for j in range(i+1, n_nodes):
+        # Extract edge values
+        edge_values = all_conn[:, i, j]
+
+        # Create covariate matrix
+        X = np.column_stack([age, sex])
+
+        # Fit regression
+        reg = LinearRegression()
+        reg.fit(X, edge_values)
+
+        # Get residuals
+        residuals = edge_values - reg.predict(X)
+
+        # Store corrected values (symmetric)
+        conn_corrected[:, i, j] = residuals
+        conn_corrected[:, j, i] = residuals
+
+# Run NBS on corrected connectivity
+pval, adj, null = nbs_bct(conn_corrected, group_labels, thresh, k)
+```
+
+## Validation and Sensitivity Analysis
+
+### Cross-Validation with Data Splitting
+
+```matlab
+% Split-half validation
+n_total = size(nbs.matrices, 4);
+n_half = floor(n_total / 2);
+
+% Random split
+rand_idx = randperm(n_total);
+split1_idx = rand_idx(1:n_half);
+split2_idx = rand_idx(n_half+1:end);
+
+% NBS on split 1
+nbs_split1 = nbs;
+nbs_split1.matrices = nbs.matrices(:, :, :, split1_idx);
+nbs_split1.design = nbs.design(split1_idx, :);
+[result1] = NBSrun(nbs_split1);
+
+% NBS on split 2
+nbs_split2 = nbs;
+nbs_split2.matrices = nbs.matrices(:, :, :, split2_idx);
+nbs_split2.design = nbs.design(split2_idx, :);
+[result2] = NBSrun(nbs_split2);
+
+% Compare significant edges
+if result1.n > 0 && result2.n > 0
+    edges1 = result1.con_mat{1};
+    edges2 = result2.con_mat{1};
+
+    % Overlap
+    overlap = edges1 .* edges2;
+    overlap_pct = nnz(overlap) / max(nnz(edges1), nnz(edges2)) * 100;
+
+    fprintf('Edge overlap between splits: %.1f%%\n', overlap_pct);
+end
+```
+
+### Threshold Sensitivity Analysis
+
+```matlab
+% Test range of thresholds and plot results
+thresholds = 2.0:0.2:4.5;
+n_thresholds = length(thresholds);
+
+results_sensitivity = struct();
+results_sensitivity.thresholds = thresholds;
+results_sensitivity.n_components = zeros(n_thresholds, 1);
+results_sensitivity.largest_comp_size = zeros(n_thresholds, 1);
+results_sensitivity.min_pval = ones(n_thresholds, 1);
+
+for t = 1:n_thresholds
+    nbs.thresh = thresholds(t);
+    [result] = NBSrun(nbs);
+
+    results_sensitivity.n_components(t) = result.n;
+
+    if result.n > 0
+        results_sensitivity.largest_comp_size(t) = max(result.comp_size);
+        results_sensitivity.min_pval(t) = min(result.pval);
+    end
+end
+
+% Plot sensitivity results
+figure('Position', [100, 100, 1200, 400]);
+
+subplot(1, 3, 1);
+plot(thresholds, results_sensitivity.n_components, 'b-o', 'LineWidth', 2);
+xlabel('Threshold');
+ylabel('Number of Components');
+title('Components vs. Threshold');
+grid on;
+
+subplot(1, 3, 2);
+plot(thresholds, results_sensitivity.largest_comp_size, 'r-o', 'LineWidth', 2);
+xlabel('Threshold');
+ylabel('Largest Component Size');
+title('Component Size vs. Threshold');
+grid on;
+
+subplot(1, 3, 3);
+semilogy(thresholds, results_sensitivity.min_pval, 'g-o', 'LineWidth', 2);
+hold on;
+plot([min(thresholds), max(thresholds)], [0.05, 0.05], 'k--', 'LineWidth', 1.5);
+xlabel('Threshold');
+ylabel('Minimum P-value');
+title('Significance vs. Threshold');
+legend('Min p-value', '\alpha = 0.05');
+grid on;
+
+sgtitle('NBS Threshold Sensitivity Analysis');
+```
+
 ## Troubleshooting
 
 **Problem:** No significant components found
